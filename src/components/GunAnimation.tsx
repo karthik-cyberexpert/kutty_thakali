@@ -19,8 +19,8 @@ const GunAnimation: React.FC<GunAnimationProps> = ({ onShotComplete }) => {
     const bullet = bulletRef.current;
     if (!gun || !bullet) return;
 
-    // Initial position for the gun (bottom-left, slightly off-screen)
-    gsap.set(gun, { x: -100, y: window.innerHeight - 100, opacity: 0, rotation: -45 });
+    // Initial position for the gun (center-left, off-screen)
+    gsap.set(gun, { x: -100, y: holeTargetY - 40, opacity: 0 }); // Centered vertically
     gsap.set(bullet, { opacity: 0, scale: 0 });
 
     const tl = gsap.timeline({
@@ -29,10 +29,10 @@ const GunAnimation: React.FC<GunAnimationProps> = ({ onShotComplete }) => {
       },
     });
 
-    tl.to(gun, { x: 50, y: window.innerHeight - 150, opacity: 1, rotation: -15, duration: 0.8, ease: 'power2.out' }) // Gun slides in
-      .to(gun, { y: '-=20', duration: 0.1, yoyo: true, repeat: 1 }, '+=0.2') // Slight recoil
+    tl.to(gun, { x: 50, opacity: 1, duration: 0.8, ease: 'power2.out' }) // Gun slides in
+      .to(gun, { x: '+=20', duration: 0.1, yoyo: true, repeat: 1 }, '+=0.2') // Recoil effect
       .fromTo(bullet,
-        { x: 100, y: window.innerHeight - 150, opacity: 1, scale: 0.5, backgroundColor: '#ff00ff' }, // Start near gun
+        { opacity: 1, scale: 0.5, backgroundColor: '#ff00ff' },
         {
           x: holeTargetX,
           y: holeTargetY,
@@ -44,7 +44,7 @@ const GunAnimation: React.FC<GunAnimationProps> = ({ onShotComplete }) => {
             // Position bullet relative to gun before shooting
             const gunRect = gun.getBoundingClientRect();
             gsap.set(bullet, {
-              x: gunRect.right - 20, // Adjust based on gun icon size
+              x: gunRect.right - 20,
               y: gunRect.top + gunRect.height / 2,
               opacity: 1,
               scale: 0.5,
