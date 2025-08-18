@@ -4,7 +4,7 @@ import { gsap } from 'gsap';
 interface PhotoTrainProps {
   images: string[];
   onComplete: () => void;
-  holePosition: { x: number; y: number }; // New prop for hole position
+  holePosition: { x: number; y: number };
 }
 
 const PhotoTrain: React.FC<PhotoTrainProps> = ({ images, onComplete, holePosition }) => {
@@ -17,49 +17,58 @@ const PhotoTrain: React.FC<PhotoTrainProps> = ({ images, onComplete, holePositio
     const imageElements = Array.from(container.children) as HTMLElement[];
     if (imageElements.length === 0) return;
 
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const imageWidth = 192; // w-48 is 12rem = 192px
+    const imageHeight = 192;
+
     // Initial position for images: inside the hole, scaled down
     gsap.set(imageElements, {
       x: holePosition.x,
       y: holePosition.y,
-      xPercent: -50, // Center images relative to their own size
+      xPercent: -50,
       yPercent: -50,
-      scale: 0, // Start invisible/small
+      scale: 0,
       opacity: 0,
     });
 
     const tl = gsap.timeline({
       onComplete: () => {
-        setTimeout(onComplete, 1000);
+        // Fade out all images before completing
+        gsap.to(imageElements, {
+            opacity: 0,
+            scale: 0.8,
+            duration: 1,
+            ease: 'power2.in',
+            onComplete: () => {
+                setTimeout(onComplete, 500); // A short delay after fade out
+            }
+        });
       },
     });
 
-    // Animate images emerging from the hole and moving across the screen
+    // Animate images emerging from the hole and scattering across the screen
     tl.to(imageElements, {
-      scale: 1, // Scale up
-      opacity: 1, // Fade in
-      x: (i) => holePosition.x - (i + 1) * 300, // Move left, staggered
-      y: (i) => holePosition.y + (i % 2 === 0 ? 50 : -50), // Slight vertical variation
-      rotation: (i) => (i % 2 === 0 ? 10 : -10), // Slight rotation
-      duration: 2, // Time to emerge and start moving
+      scale: 1,
+      opacity: 1,
+      x: () => gsap.utils.random(imageWidth / 2, screenWidth - imageWidth / 2),
+      y: () => gsap.utils.random(imageHeight / 2, screenHeight - imageHeight / 2),
+      rotation: () => gsap.utils.random(-20, 20),
+      duration: 1.5,
       ease: 'power2.out',
       stagger: {
-        each: 0.5, // Stagger emergence
+        each: 0.1, // Faster stagger
         from: 'start',
       },
-    })
-    .to(imageElements, {
-      x: -window.innerWidth, // Continue moving off-screen left
-      duration: 8, // Longer duration for the main travel
-      ease: 'linear',
-      stagger: {
-        each: 1,
-        from: 'start',
-      },
-    }, '-=1.5'); // Overlap with the emergence animation
+    });
+
+    // Hold the images on screen for a few seconds
+    tl.to({}, { duration: 5 }); // Empty tween to add a delay
+
   }, [images, onComplete, holePosition]);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 z-10">
+    <div ref={containerRef} className="absolute inset-0 z-10 overflow-hidden">
       {images.map((src, index) => (
         <img
           key={index}
