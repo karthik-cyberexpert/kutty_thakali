@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import ParticlesBackground from "@/components/ParticlesBackground";
 import GiftBox from "@/components/GiftBox";
 import Confetti from "@/components/Confetti";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 gsap.registerPlugin(MotionPathPlugin);
 
@@ -12,12 +14,14 @@ type AnimationPhase = "gift" | "photos" | "character" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
+  const navigate = useNavigate();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [path, setPath] = useState("");
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const characterRef = useRef<HTMLDivElement>(null);
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
+  const backButtonRef = useRef<HTMLButtonElement>(null);
 
   const images = Array.from({ length: 23 }, (_, i) => `https://picsum.photos/seed/${i + 1}/200`);
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
@@ -59,19 +63,25 @@ const Surprise = () => {
     } else if (animationPhase === "finalMessage") {
       const gift = finalGiftRef.current;
       const message = messageRef.current;
-      if (!gift || !message) return;
+      const backButton = backButtonRef.current;
+      if (!gift || !message || !backButton) return;
 
       const letters = message.querySelectorAll('span');
       gsap.timeline()
         .fromTo(gift, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 1, ease: 'bounce.out' })
         .to(gift, { x: '+=10', yoyo: true, repeat: 5, duration: 0.1, ease: 'power1.inOut' }) // Shaking
         .to(gift, { scale: 1.5, opacity: 0, duration: 0.5, ease: 'power2.in' })
-        .fromTo(letters, { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.05, duration: 0.5, ease: 'power2.out' }, "-=0.2");
+        .fromTo(letters, { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.05, duration: 0.5, ease: 'power2.out' }, "-=0.2")
+        .fromTo(backButton, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, "+=0.5");
     }
   }, [animationPhase, path]);
 
   const handleGiftOpen = () => {
     setTimeout(() => setAnimationPhase("photos"), 500);
+  };
+
+  const handleGoBack = () => {
+    navigate('/');
   };
 
   return (
@@ -107,6 +117,14 @@ const Surprise = () => {
             <div ref={messageRef} className="font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400" style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>
               {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>)}
             </div>
+            <Button
+              ref={backButtonRef}
+              onClick={handleGoBack}
+              className="mt-8 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300 opacity-0"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Create Another Surprise
+            </Button>
           </div>
         )}
       </div>
