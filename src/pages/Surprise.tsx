@@ -6,7 +6,7 @@ import GiftBox from "@/components/GiftBox";
 import Confetti from "@/components/Confetti";
 import AudioPlayer from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Eye, Train } from "lucide-react"; // Import Train icon
+import { RefreshCw, Eye, Play } from "lucide-react";
 import PhotoTrain from "@/components/PhotoTrain";
 import GiftBurst from "@/components/GiftBurst";
 import BoyAndPaperAnimation from "@/components/BoyAndPaperAnimation";
@@ -19,7 +19,6 @@ const Surprise = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [hasPlayedIntroAnimation, setHasPlayedIntroAnimation] = useState(false);
   const [showPhotoTrainButton, setShowPhotoTrainButton] = useState(false); 
-  const [engineButtonPosition, setEngineButtonPosition] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
@@ -70,7 +69,6 @@ const Surprise = () => {
     setIsTransitioning(false);
     setAnimationPhase('gift');
     setShowPhotoTrainButton(false);
-    setEngineButtonPosition(null); // Reset engine position on replay
   }, []);
 
   const handleReveal = useCallback(() => {
@@ -120,13 +118,8 @@ const Surprise = () => {
   }, []);
 
   const handleStartPhotoTrain = useCallback(() => {
-    if (startTrainButtonRef.current) {
-      const rect = startTrainButtonRef.current.getBoundingClientRect();
-      // Pass the full rect details to PhotoTrain
-      setEngineButtonPosition({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
-    }
-    setShowPhotoTrainButton(false); // Hide the button
-    setAnimationPhase("photoTrain"); // Start the photo train
+    setShowPhotoTrainButton(false);
+    setAnimationPhase("photoTrain");
   }, []);
 
   return (
@@ -144,19 +137,19 @@ const Surprise = () => {
 
         {animationPhase === 'prePhotoTrainButton' && showPhotoTrainButton && (
           <div className="flex flex-col items-center">
-            {/* Removed "Ready for more magic?" text */}
+            <h2 className="text-3xl md:text-5xl font-bold mb-8 animate-fade-in-down">Ready for more magic?</h2>
             <Button
               ref={startTrainButtonRef}
               onClick={handleStartPhotoTrain}
-              className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-6 px-10 text-6xl rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 opacity-0"
+              className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-6 px-10 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 opacity-0"
             >
-              <Train className="h-12 w-12" /> {/* Train SVG icon */}
+              Start Photo Train <Play className="ml-2" />
             </Button>
           </div>
         )}
 
-        {animationPhase === 'photoTrain' && engineButtonPosition && (
-          <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} enginePosition={engineButtonPosition} />
+        {animationPhase === 'photoTrain' && (
+          <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} />
         )}
 
         {animationPhase === "finalMessage" && (
