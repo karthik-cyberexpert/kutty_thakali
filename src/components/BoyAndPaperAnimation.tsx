@@ -3,9 +3,10 @@ import { gsap } from 'gsap';
 
 interface BoyAndPaperAnimationProps {
   onComplete: () => void;
+  onPaperCover: () => void;
 }
 
-const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete }) => {
+const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete, onPaperCover }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const boyRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
@@ -38,9 +39,11 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete 
         y: screenHeight / 2,
         width: '100vw',
         height: '100vh',
+        borderRadius: 0,
         rotation: 360,
         duration: 0.7,
-        ease: 'power2.in'
+        ease: 'power2.in',
+        onStart: onPaperCover, // Callback when paper covers the screen
       }, '-=0.5')
       // Paper falls down
       .to(paper, {
@@ -49,10 +52,10 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete 
         ease: 'power1.in'
       }, '+=0.3');
 
-  }, [onComplete]);
+  }, [onComplete, onPaperCover]);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 z-20 overflow-hidden">
+    <div ref={containerRef} className="absolute inset-0 overflow-hidden">
       <div ref={boyRef} className="absolute text-8xl" style={{ transformOrigin: 'bottom center' }}>🚶‍♂️</div>
       <div 
         ref={paperRef} 
