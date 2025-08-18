@@ -17,6 +17,7 @@ const Surprise = () => {
   const { name } = useParams();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [hasPlayedIntroAnimation, setHasPlayedIntroAnimation] = useState(false); // New state to track if intro played
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
@@ -59,6 +60,7 @@ const Surprise = () => {
   const handleReplay = () => {
     setIsTransitioning(false);
     setAnimationPhase('gift');
+    // Do NOT reset hasPlayedIntroAnimation, so the boy/paper animation doesn't replay
   };
 
   const handleReveal = () => {
@@ -136,12 +138,15 @@ const Surprise = () => {
         )}
       </div>
 
-      {isTransitioning && (
+      {isTransitioning && !hasPlayedIntroAnimation && ( // Only render if transitioning AND intro hasn't played
         <div className="absolute inset-0 z-20">
           <GiftBurst />
           <BoyAndPaperAnimation
             onPaperCover={() => setAnimationPhase('photoTrain')}
-            onComplete={() => setIsTransitioning(false)}
+            onComplete={() => {
+              setIsTransitioning(false);
+              setHasPlayedIntroAnimation(true); // Mark intro as played
+            }}
           />
         </div>
       )}
