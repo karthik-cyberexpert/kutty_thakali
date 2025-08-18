@@ -65,10 +65,31 @@ const Surprise = () => {
     const replayButton = replayButtonRef.current;
 
     if (message && revealButton && replayButton) {
+      const gradientClasses = ['bg-clip-text', 'text-transparent', 'bg-gradient-to-r', 'from-pink-400', 'via-purple-400', 'to-cyan-400'];
+      
       const tl = gsap.timeline();
       tl.to(revealButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in' })
-        .to(message, { filter: 'blur(0px)', duration: 1.5, ease: 'power2.out' }, 0)
-        .to(message, { filter: 'blur(16px)', duration: 1.5, ease: 'power2.inOut', delay: 2.5 })
+        .to(message, { 
+          filter: 'blur(0px)', 
+          duration: 1.5, 
+          ease: 'power2.out',
+          onStart: () => {
+            message.classList.remove(...gradientClasses);
+            message.classList.add('text-cyan-300');
+            message.style.textShadow = '0 0 15px rgba(0, 255, 255, 0.7)';
+          }
+        }, 0)
+        .to(message, { 
+          filter: 'blur(16px)', 
+          duration: 1.5, 
+          ease: 'power2.inOut', 
+          delay: 2.5,
+          onStart: () => {
+            message.classList.add(...gradientClasses);
+            message.classList.remove('text-cyan-300');
+            message.style.textShadow = '0 0 10px rgba(255,255,255,0.5)';
+          }
+        })
         .to(replayButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' });
     }
   };
@@ -102,7 +123,7 @@ const Surprise = () => {
               {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>)}
             </div>
             
-            <div className="mt-8 h-12 relative">
+            <div className="mt-8 h-12 relative min-w-[240px]">
               <Button
                 ref={revealButtonRef}
                 onClick={handleReveal}
