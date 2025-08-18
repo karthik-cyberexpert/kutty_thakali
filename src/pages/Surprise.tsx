@@ -158,17 +158,6 @@ const Surprise = () => {
           </div>
         )}
 
-        {animationPhase === 'shooting' && (
-          <GunAnimation onShotComplete={handleGunShotComplete} />
-        )}
-
-        {animationPhase === 'photoTrain' && bulletHolePosition && (
-          <>
-            <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />
-            <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />
-          </>
-        )}
-
         {animationPhase === "finalMessage" && (
           <div className="flex flex-col items-center">
             <div ref={finalGiftRef} className="text-8xl">🎁</div>
@@ -191,6 +180,18 @@ const Surprise = () => {
           </div>
         )}
       </div>
+
+      {/* Full-screen animations are now siblings to the main content div */}
+      {animationPhase === 'shooting' && (
+        <GunAnimation onShotComplete={handleGunShotComplete} />
+      )}
+
+      {animationPhase === 'photoTrain' && bulletHolePosition && (
+        <>
+          <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />
+          <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />
+        </>
+      )}
 
       {isTransitioning && !hasPlayedIntroAnimation && (
         <div className="absolute inset-0 z-20">
