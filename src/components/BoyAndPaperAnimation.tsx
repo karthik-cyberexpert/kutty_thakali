@@ -35,8 +35,8 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
       .to(paper, { x: '+=30', duration: 1 }, '<')
       // Paper flies to screen
       .to(paper, {
-        x: screenWidth / 2,
-        y: screenHeight / 2,
+        x: '50%',
+        y: '50%',
         width: '110vw',
         height: '110vh',
         borderRadius: 0,
@@ -60,7 +60,14 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
       <div 
         ref={paperRef} 
         className="absolute bg-white rounded-md shadow-2xl"
-        style={{ width: '80px', height: '100px', transformOrigin: 'center center' }}
+        style={{ 
+          width: '80px', 
+          height: '100px', 
+          transformOrigin: 'center center',
+          // Position the element's top-left corner so its center is at (0,0)
+          top: '-50%', 
+          left: '-50%'
+        }}
       />
     </div>
   );
