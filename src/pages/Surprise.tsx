@@ -9,13 +9,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import PhotoTrain from "@/components/PhotoTrain";
 
-type AnimationPhase = "gift" | "photoExplosion" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
   const navigate = useNavigate();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
-  const imageContainerRef = useRef<HTMLDivElement>(null);
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
@@ -25,39 +24,7 @@ const Surprise = () => {
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
 
   useEffect(() => {
-    if (animationPhase === "photoExplosion") {
-      const imageElements = Array.from(imageContainerRef.current?.children || []);
-      if (imageElements.length === 0) return;
-
-      const tl = gsap.timeline({ onComplete: () => setTimeout(() => setAnimationPhase("photoTrain"), 1000) });
-      tl.set(imageElements, {
-        top: '50%',
-        left: '50%',
-        xPercent: -50,
-        yPercent: -50,
-        scale: 0,
-        autoAlpha: 0,
-      })
-      .to(imageElements, {
-        autoAlpha: 1,
-        scale: 1,
-        duration: 0.5,
-        stagger: 0.1,
-      })
-      .to(imageElements, {
-        x: () => gsap.utils.random(-window.innerWidth / 2.5, window.innerWidth / 2.5),
-        y: () => gsap.utils.random(-window.innerHeight / 2.5, window.innerHeight / 2.5),
-        rotation: () => gsap.utils.random(-30, 30),
-        duration: 1.5,
-        ease: 'power2.out',
-        stagger: 0.05,
-      })
-      .to(imageElements, {
-        autoAlpha: 0,
-        duration: 1,
-        delay: 2,
-      });
-    } else if (animationPhase === "finalMessage") {
+    if (animationPhase === "finalMessage") {
       const gift = finalGiftRef.current;
       const message = messageRef.current;
       const backButton = backButtonRef.current;
@@ -74,7 +41,7 @@ const Surprise = () => {
   }, [animationPhase]);
 
   const handleGiftOpen = () => {
-    setTimeout(() => setAnimationPhase("photoExplosion"), 500);
+    setTimeout(() => setAnimationPhase("photoTrain"), 500);
   };
   
   const handlePhotoTrainComplete = () => {
@@ -97,12 +64,6 @@ const Surprise = () => {
             <GiftBox onOpen={handleGiftOpen} />
           </>
         )}
-
-        <div ref={imageContainerRef} className="absolute top-0 left-0 w-full h-full pointer-events-none">
-          {animationPhase === "photoExplosion" && images.map((src, index) => (
-            <img key={index} src={src} alt={`Surprise image ${index + 1}`} className="absolute w-24 h-24 object-cover rounded-full border-4 border-pink-400 shadow-lg will-change-transform opacity-0" style={{ boxShadow: '0 0 15px #ff00ff, 0 0 25px #ff00ff', transformOrigin: 'center center' }} />
-          ))}
-        </div>
 
         {animationPhase === "photoTrain" && (
           <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} />
