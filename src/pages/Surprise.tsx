@@ -5,6 +5,7 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import ParticlesBackground from "@/components/ParticlesBackground";
 import GiftBox from "@/components/GiftBox";
 import Confetti from "@/components/Confetti";
+import AudioPlayer from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
@@ -87,6 +88,7 @@ const Surprise = () => {
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       <ParticlesBackground />
+      <AudioPlayer src="/birthday-music.mp3" />
       <svg className="absolute w-0 h-0"><path id="path" d={path} stroke="none" fill="none" /></svg>
 
       <div className="relative z-10 flex flex-col items-center justify-center text-center text-white">
