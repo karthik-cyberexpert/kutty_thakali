@@ -2,19 +2,18 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import ParticlesBackground from "@/components/ParticlesBackground";
-import GiftBox from "@/components/GiftBox";
 import Confetti from "@/components/Confetti";
 import AudioPlayer from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import PhotoTrain from "@/components/PhotoTrain";
 
-type AnimationPhase = "gift" | "photoTrain" | "finalMessage";
+type AnimationPhase = "intro" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
   const navigate = useNavigate();
-  const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
+  const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("intro");
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
@@ -24,6 +23,13 @@ const Surprise = () => {
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
 
   useEffect(() => {
+    if (animationPhase === "intro") {
+      const timer = setTimeout(() => {
+        setAnimationPhase("photoTrain");
+      }, 3000); // Wait 3 seconds before starting the photo train
+      return () => clearTimeout(timer);
+    }
+
     if (animationPhase === "finalMessage") {
       const gift = finalGiftRef.current;
       const message = messageRef.current;
@@ -40,10 +46,6 @@ const Surprise = () => {
     }
   }, [animationPhase]);
 
-  const handleGiftOpen = () => {
-    setTimeout(() => setAnimationPhase("photoTrain"), 500);
-  };
-  
   const handlePhotoTrainComplete = () => {
     setAnimationPhase("finalMessage");
   };
@@ -58,11 +60,8 @@ const Surprise = () => {
       <AudioPlayer src="/birthday-music.mp3" />
 
       <div className="relative z-10 flex flex-col items-center justify-center text-center text-white">
-        {animationPhase === "gift" && (
-          <>
-            <h1 className="text-4xl md:text-6xl font-bold mb-8 animate-fade-in-down">A special gift for you, {name}!</h1>
-            <GiftBox onOpen={handleGiftOpen} />
-          </>
+        {animationPhase === "intro" && (
+          <h1 className="text-4xl md:text-6xl font-bold mb-8 animate-fade-in-down">A special surprise for you, {name}!</h1>
         )}
 
         {animationPhase === "photoTrain" && (
