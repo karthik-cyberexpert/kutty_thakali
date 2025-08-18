@@ -1,24 +1,23 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { gsap } from "gsap";
 import ParticlesBackground from "@/components/ParticlesBackground";
 import GiftBox from "@/components/GiftBox";
 import Confetti from "@/components/Confetti";
 import AudioPlayer from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Eye } from "lucide-react";
+import { RefreshCw, Eye } from "lucide-react";
 import PhotoTrain from "@/components/PhotoTrain";
 
 type AnimationPhase = "gift" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
-  const navigate = useNavigate();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [isMessageRevealed, setIsMessageRevealed] = useState(false);
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
-  const backButtonRef = useRef<HTMLButtonElement>(null);
+  const replayButtonRef = useRef<HTMLButtonElement>(null);
   const revealButtonRef = useRef<HTMLButtonElement>(null);
 
   const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
@@ -27,10 +26,14 @@ const Surprise = () => {
 
   useEffect(() => {
     if (animationPhase === "finalMessage") {
+      setIsMessageRevealed(false);
       const gift = finalGiftRef.current;
       const message = messageRef.current;
       const revealButton = revealButtonRef.current;
       if (!gift || !message || !revealButton) return;
+
+      if (revealButton) revealButton.style.pointerEvents = 'auto';
+      gsap.set(message, { filter: 'blur(16px)' });
 
       const letters = message.querySelectorAll('span');
       gsap.timeline()
@@ -50,25 +53,27 @@ const Surprise = () => {
     setAnimationPhase("finalMessage");
   };
 
-  const handleGoBack = () => {
-    navigate('/');
+  const handleReplay = () => {
+    setAnimationPhase('gift');
   };
 
   const handleReveal = () => {
-    setIsMessageRevealed(true);
+    const message = messageRef.current;
+    const revealButton = revealButtonRef.current;
+    const replayButton = replayButtonRef.current;
 
-    gsap.delayedCall(0.01, () => {
-      const message = messageRef.current;
-      const revealButton = revealButtonRef.current;
-      const backButton = backButtonRef.current;
-
-      if (message && revealButton && backButton) {
-        const tl = gsap.timeline();
-        tl.to(message, { filter: 'blur(0px)', duration: 1.5, ease: 'power2.out' })
-          .to(revealButton, { opacity: 0, y: -20, duration: 0.5, ease: 'power2.in' }, 0)
-          .fromTo(backButton, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
-      }
-    });
+    if (message && revealButton && replayButton) {
+      revealButton.style.pointerEvents = 'none';
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setIsMessageRevealed(true);
+        }
+      });
+      tl.to(revealButton, { opacity: 0, y: -20, duration: 0.5, ease: 'power2.in' })
+        .to(message, { filter: 'blur(0px)', duration: 1.5, ease: 'power2.out' }, 0)
+        .to(message, { filter: 'blur(16px)', duration: 1.5, ease: 'power2.inOut', delay: 2.5 })
+        .fromTo(replayButton, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+    }
   };
 
   return (
@@ -94,7 +99,7 @@ const Surprise = () => {
             {finalGiftRef.current && gsap.getProperty(finalGiftRef.current, "opacity") === 0 && <Confetti />}
             <div 
               ref={messageRef} 
-              className="font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 blur-lg" 
+              className="font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400"
               style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
             >
               {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>)}
@@ -112,12 +117,12 @@ const Surprise = () => {
                 </Button>
               ) : (
                 <Button
-                  ref={backButtonRef}
-                  onClick={handleGoBack}
+                  ref={replayButtonRef}
+                  onClick={handleReplay}
                   className="bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300 opacity-0"
                 >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Create Another Surprise
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Replay
                 </Button>
               )}
             </div>
