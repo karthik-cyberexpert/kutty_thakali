@@ -14,7 +14,6 @@ type AnimationPhase = "gift" | "photoTrain" | "finalMessage";
 const Surprise = () => {
   const { name } = useParams();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
-  const [isMessageRevealed, setIsMessageRevealed] = useState(false);
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
@@ -26,13 +25,16 @@ const Surprise = () => {
 
   useEffect(() => {
     if (animationPhase === "finalMessage") {
-      setIsMessageRevealed(false);
       const gift = finalGiftRef.current;
       const message = messageRef.current;
       const revealButton = revealButtonRef.current;
-      if (!gift || !message || !revealButton) return;
+      const replayButton = replayButtonRef.current;
 
-      if (revealButton) revealButton.style.pointerEvents = 'auto';
+      if (!gift || !message || !revealButton || !replayButton) return;
+
+      // Reset button states
+      gsap.set(revealButton, { opacity: 0, y: 20, pointerEvents: 'none' });
+      gsap.set(replayButton, { opacity: 0, y: 20, pointerEvents: 'none' });
       gsap.set(message, { filter: 'blur(16px)' });
 
       const letters = message.querySelectorAll('span');
@@ -41,7 +43,7 @@ const Surprise = () => {
         .to(gift, { x: '+=10', yoyo: true, repeat: 5, duration: 0.1, ease: 'power1.inOut' })
         .to(gift, { scale: 1.5, opacity: 0, duration: 0.5, ease: 'power2.in' })
         .fromTo(letters, { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.05, duration: 0.5, ease: 'power2.out' }, "-=0.2")
-        .fromTo(revealButton, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, "+=0.5");
+        .to(revealButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' }, "+=0.5");
     }
   }, [animationPhase]);
 
@@ -63,16 +65,11 @@ const Surprise = () => {
     const replayButton = replayButtonRef.current;
 
     if (message && revealButton && replayButton) {
-      revealButton.style.pointerEvents = 'none';
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setIsMessageRevealed(true);
-        }
-      });
-      tl.to(revealButton, { opacity: 0, y: -20, duration: 0.5, ease: 'power2.in' })
+      const tl = gsap.timeline();
+      tl.to(revealButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in' })
         .to(message, { filter: 'blur(0px)', duration: 1.5, ease: 'power2.out' }, 0)
         .to(message, { filter: 'blur(16px)', duration: 1.5, ease: 'power2.inOut', delay: 2.5 })
-        .fromTo(replayButton, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+        .to(replayButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' });
     }
   };
 
@@ -105,26 +102,23 @@ const Surprise = () => {
               {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>)}
             </div>
             
-            <div className="mt-8 h-12">
-              {!isMessageRevealed ? (
-                <Button
-                  ref={revealButtonRef}
-                  onClick={handleReveal}
-                  className="bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300 opacity-0"
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  Reveal Message
-                </Button>
-              ) : (
-                <Button
-                  ref={replayButtonRef}
-                  onClick={handleReplay}
-                  className="bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300 opacity-0"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Replay
-                </Button>
-              )}
+            <div className="mt-8 h-12 relative">
+              <Button
+                ref={revealButtonRef}
+                onClick={handleReveal}
+                className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Reveal Message
+              </Button>
+              <Button
+                ref={replayButtonRef}
+                onClick={handleReplay}
+                className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Replay
+              </Button>
             </div>
           </div>
         )}
