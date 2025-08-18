@@ -20,38 +20,41 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
     const screenHeight = window.innerHeight;
 
     // Initial positions
-    gsap.set(boy, { x: -100, y: screenHeight - 150 }); // Boy starts at bottom left, off-screen
-    gsap.set(paper, { x: screenWidth / 2, y: screenHeight - 100, rotation: -75 }); // Paper on the "floor"
+    // Boy starts off-screen left, at the bottom
+    gsap.set(boy, { x: -150, y: screenHeight - 150 }); 
+    // Paper starts on the "floor" near the center, slightly rotated
+    gsap.set(paper, { x: screenWidth / 2 - 40, y: screenHeight - 100, rotation: -75 }); 
 
     const tl = gsap.timeline({ onComplete, delay: 1.5 }); // Delay to let burst happen
 
     // Boy walks to paper
-    tl.to(boy, { x: screenWidth / 2 - 80, duration: 4, ease: 'none' })
-      // Boy picks up paper
+    tl.to(boy, { x: screenWidth / 2 - 120, duration: 3, ease: 'none' }) // Boy walks to the left of the paper
+      // Boy picks up paper (slight bounce, paper moves with boy)
       .to(boy, { y: '+=10', duration: 0.2, yoyo: true, repeat: 1 }, '-=0.3')
-      .to(paper, { y: screenHeight - 160, x: screenWidth / 2 - 60, rotation: 0, duration: 0.2 }, '<')
-      // Boy turns and throws
-      .to(boy, { x: '+=30', duration: 1 })
-      .to(paper, { x: '+=30', duration: 1 }, '<')
-      // Paper flies to screen
+      .to(paper, { y: screenHeight - 160, x: screenWidth / 2 - 100, rotation: 0, duration: 0.2 }, '<') // Paper moves up and aligns with boy's hand
+      // Boy turns and throws (boy moves slightly, paper moves with boy)
+      .to(boy, { x: '+=30', duration: 0.5 }, '+=0.2') // Boy shifts slightly
+      .to(paper, { x: '+=30', duration: 0.5 }, '<') // Paper shifts with boy
+      // Paper flies to screen and covers it
       .to(paper, {
-        x: '50%',
-        y: '50%',
-        width: '110vw',
-        height: '110vh',
+        x: '50vw', // Move center to 50% viewport width
+        y: '50vh', // Move center to 50% viewport height
+        xPercent: -50, // Adjust for element's own width to truly center
+        yPercent: -50, // Adjust for element's own height to truly center
+        width: '120vw', // Ensure it covers more than 100%
+        height: '120vh', // Ensure it covers more than 100%
         borderRadius: 0,
-        rotation: 360,
-        duration: 1.2,
+        rotation: 720, // More rotation for dramatic effect
+        duration: 1.5, // Slower flight
         ease: 'power2.in',
         onComplete: onPaperCover, // Trigger when paper has FINISHED covering
-      }, '-=0.5')
-      // Paper falls down
+      }, '+=0.2') // Slight delay after boy throws
+      // Paper falls down slowly
       .to(paper, {
-        y: screenHeight * 1.5,
-        duration: 2,
+        y: screenHeight * 1.5, // Fall far off-screen
+        duration: 2.5, // Slower fall
         ease: 'power1.in'
-      }, '+=0.5'); // Pause for a moment before falling
-
+      }, '+=0.5'); // Pause for a moment after covering before falling
   }, [onComplete, onPaperCover]);
 
   return (
@@ -60,14 +63,7 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
       <div 
         ref={paperRef} 
         className="absolute bg-white rounded-md shadow-2xl"
-        style={{ 
-          width: '80px', 
-          height: '100px', 
-          transformOrigin: 'center center',
-          // Position the element's top-left corner so its center is at (0,0)
-          top: '-50%', 
-          left: '-50%'
-        }}
+        style={{ width: '80px', height: '100px', transformOrigin: 'center center' }}
       />
     </div>
   );

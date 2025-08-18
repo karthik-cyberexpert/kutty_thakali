@@ -24,7 +24,7 @@ const PhotoTrain: React.FC<PhotoTrainProps> = ({ images, onComplete }) => {
     });
 
     const tl = gsap.timeline({
-      delay: 0.5, // Wait for paper to start falling before starting
+      // No delay here, animation starts immediately when component mounts
       onComplete: () => {
         setTimeout(onComplete, 1000);
       },
@@ -43,7 +43,7 @@ const PhotoTrain: React.FC<PhotoTrainProps> = ({ images, onComplete }) => {
   }, [images, onComplete]);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 z-20">
+    <div ref={containerRef} className="absolute inset-0 z-10">
       {images.map((src, index) => (
         <img
           key={index}
