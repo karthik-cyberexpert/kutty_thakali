@@ -54,7 +54,8 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
       .to(paper, {
         y: screenHeight * 1.5, // Fall far off-screen
         duration: 3.5, // Slower fall to reveal PhotoTrain more gradually
-        ease: 'power1.in'
+        ease: 'none', // Changed to 'none' for consistent speed
+        opacity: 1 // Explicitly keep opacity at 1
       }, '+=0.5'); // Pause for a moment after covering before falling
   }, [onComplete, onPaperCover]);
 
