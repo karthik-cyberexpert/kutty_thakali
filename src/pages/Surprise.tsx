@@ -8,12 +8,15 @@ import AudioPlayer from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Eye } from "lucide-react";
 import PhotoTrain from "@/components/PhotoTrain";
+import GiftBurst from "@/components/GiftBurst";
+import BoyAndPaperAnimation from "@/components/BoyAndPaperAnimation";
 
 type AnimationPhase = "gift" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
+  const [isGiftOpening, setIsGiftOpening] = useState(false);
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
@@ -48,9 +51,14 @@ const Surprise = () => {
   }, [animationPhase]);
 
   const handleGiftOpen = () => {
-    setTimeout(() => setAnimationPhase("photoTrain"), 500);
+    setIsGiftOpening(true);
   };
   
+  const startPhotoTrain = () => {
+    setIsGiftOpening(false);
+    setAnimationPhase("photoTrain");
+  };
+
   const handlePhotoTrainComplete = () => {
     setAnimationPhase("finalMessage");
   };
@@ -106,8 +114,16 @@ const Surprise = () => {
       <div className="relative z-10 flex flex-col items-center justify-center text-center text-white">
         {animationPhase === "gift" && (
           <>
-            <h1 className="text-4xl md:text-6xl font-bold mb-8 animate-fade-in-down">A special gift for you, {name}!</h1>
-            <GiftBox onOpen={handleGiftOpen} />
+            <div style={{ opacity: isGiftOpening ? 0 : 1, transition: 'opacity 0.3s ease-in-out' }} className="flex flex-col items-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-8 animate-fade-in-down">A special gift for you, {name}!</h1>
+              <GiftBox onOpen={handleGiftOpen} />
+            </div>
+            {isGiftOpening && (
+              <>
+                <GiftBurst />
+                <BoyAndPaperAnimation onComplete={startPhotoTrain} />
+              </>
+            )}
           </>
         )}
 
