@@ -6,25 +6,28 @@ import GiftBox from "@/components/GiftBox";
 import Confetti from "@/components/Confetti";
 import AudioPlayer from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Eye, Play } from "lucide-react";
+import { RefreshCw, Eye } from "lucide-react";
 import PhotoTrain from "@/components/PhotoTrain";
 import GiftBurst from "@/components/GiftBurst";
 import BoyAndPaperAnimation from "@/components/BoyAndPaperAnimation";
+import GunAnimation from "@/components/GunAnimation";
+import BulletHole from "@/components/BulletHole";
 
-type AnimationPhase = "gift" | "prePhotoTrainButton" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [hasPlayedIntroAnimation, setHasPlayedIntroAnimation] = useState(false);
-  const [showPhotoTrainButton, setShowPhotoTrainButton] = useState(false); 
+  const [showShootButton, setShowShootButton] = useState(false);
+  const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
   const revealButtonRef = useRef<HTMLButtonElement>(null);
-  const startTrainButtonRef = useRef<HTMLButtonElement>(null);
+  const shootButtonRef = useRef<HTMLButtonElement>(null);
 
   const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
 
@@ -49,13 +52,13 @@ const Surprise = () => {
         .to(gift, { scale: 1.5, opacity: 0, duration: 0.5, ease: 'power2.in' })
         .fromTo(letters, { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.05, duration: 0.5, ease: 'power2.out' }, "-=0.2")
         .to(revealButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' }, "+=0.5");
-    } else if (animationPhase === "prePhotoTrainButton" && showPhotoTrainButton) {
-        gsap.fromTo(startTrainButtonRef.current, 
-            { opacity: 0, y: 50 }, 
+    } else if (animationPhase === "preShootButton" && showShootButton) {
+        gsap.fromTo(shootButtonRef.current,
+            { opacity: 0, y: 50 },
             { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.5 }
         );
     }
-  }, [animationPhase, showPhotoTrainButton]);
+  }, [animationPhase, showShootButton]);
 
   const handleGiftOpen = useCallback(() => {
     setIsTransitioning(true);
@@ -63,12 +66,14 @@ const Surprise = () => {
 
   const handlePhotoTrainComplete = useCallback(() => {
     setAnimationPhase("finalMessage");
+    setBulletHolePosition(null); // Hide the hole after photo train
   }, []);
 
   const handleReplay = useCallback(() => {
     setIsTransitioning(false);
     setAnimationPhase('gift');
-    setShowPhotoTrainButton(false);
+    setShowShootButton(false);
+    setBulletHolePosition(null); // Ensure hole is hidden on replay
   }, []);
 
   const handleReveal = useCallback(() => {
@@ -109,16 +114,21 @@ const Surprise = () => {
   const handleBoyAndPaperAnimationComplete = useCallback(() => {
     setIsTransitioning(false);
     setHasPlayedIntroAnimation(true);
-    setAnimationPhase("prePhotoTrainButton");
-    setShowPhotoTrainButton(true);
+    setAnimationPhase("preShootButton");
+    setShowShootButton(true);
   }, []);
 
   const handleBoyAndPaperAnimationPaperCover = useCallback(() => {
     // This callback no longer changes phase, the button will trigger photoTrain
   }, []);
 
-  const handleStartPhotoTrain = useCallback(() => {
-    setShowPhotoTrainButton(false);
+  const handleShoot = useCallback(() => {
+    setShowShootButton(false);
+    setAnimationPhase("shooting");
+  }, []);
+
+  const handleGunShotComplete = useCallback((holePos: { x: number; y: number }) => {
+    setBulletHolePosition(holePos);
     setAnimationPhase("photoTrain");
   }, []);
 
@@ -135,21 +145,28 @@ const Surprise = () => {
           </div>
         )}
 
-        {animationPhase === 'prePhotoTrainButton' && showPhotoTrainButton && (
+        {animationPhase === 'preShootButton' && showShootButton && (
           <div className="flex flex-col items-center">
             <h2 className="text-3xl md:text-5xl font-bold mb-8 animate-fade-in-down">Ready for more magic?</h2>
             <Button
-              ref={startTrainButtonRef}
-              onClick={handleStartPhotoTrain}
-              className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-6 px-10 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 opacity-0"
+              ref={shootButtonRef}
+              onClick={handleShoot}
+              className="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-bold py-6 px-10 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 opacity-0"
             >
-              Start Photo Train <Play className="ml-2" />
+              Shoot! 🔫
             </Button>
           </div>
         )}
 
-        {animationPhase === 'photoTrain' && (
-          <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} />
+        {animationPhase === 'shooting' && (
+          <GunAnimation onShotComplete={handleGunShotComplete} />
+        )}
+
+        {animationPhase === 'photoTrain' && bulletHolePosition && (
+          <>
+            <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />
+            <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />
+          </>
         )}
 
         {animationPhase === "finalMessage" && (
