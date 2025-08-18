@@ -57,16 +57,16 @@ const Surprise = () => {
       <ParticlesBackground />
       <AudioPlayer src="/birthday-music.mp3" />
 
+      {animationPhase === "photoTrain" && (
+        <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} />
+      )}
+
       <div className="relative z-10 flex flex-col items-center justify-center text-center text-white">
         {animationPhase === "gift" && (
           <>
             <h1 className="text-4xl md:text-6xl font-bold mb-8 animate-fade-in-down">A special gift for you, {name}!</h1>
             <GiftBox onOpen={handleGiftOpen} />
           </>
-        )}
-
-        {animationPhase === "photoTrain" && (
-          <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} />
         )}
 
         {animationPhase === "finalMessage" && (
