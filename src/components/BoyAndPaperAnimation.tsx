@@ -62,6 +62,9 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
         // Fade out the original paper quickly as the wipes start
         wipeTl.to(paper, { opacity: 0, duration: 0.2 }, 0)
               .set(paper, { display: 'none' }); // Then hide it completely
+        
+        // Hide the boy once the paper has covered the screen
+        gsap.set(boy, { opacity: 0, display: 'none' });
 
         // Animate the wipe strips
         wipeStripRefs.current.forEach((strip, i) => {
