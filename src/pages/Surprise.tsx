@@ -6,7 +6,7 @@ import GiftBox from "@/components/GiftBox";
 import Confetti from "@/components/Confetti";
 import AudioPlayer from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Eye } from "lucide-react";
+import { RefreshCw, Eye, Train } from "lucide-react"; // Import Train icon
 import PhotoTrain from "@/components/PhotoTrain";
 import GiftBurst from "@/components/GiftBurst";
 import BoyAndPaperAnimation from "@/components/BoyAndPaperAnimation";
@@ -19,7 +19,7 @@ const Surprise = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [hasPlayedIntroAnimation, setHasPlayedIntroAnimation] = useState(false);
   const [showPhotoTrainButton, setShowPhotoTrainButton] = useState(false); 
-  const [engineButtonPosition, setEngineButtonPosition] = useState<{ x: number; y: number } | null>(null);
+  const [engineButtonPosition, setEngineButtonPosition] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
@@ -122,8 +122,8 @@ const Surprise = () => {
   const handleStartPhotoTrain = useCallback(() => {
     if (startTrainButtonRef.current) {
       const rect = startTrainButtonRef.current.getBoundingClientRect();
-      // Pass the center coordinates of the button
-      setEngineButtonPosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+      // Pass the full rect details to PhotoTrain
+      setEngineButtonPosition({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
     }
     setShowPhotoTrainButton(false); // Hide the button
     setAnimationPhase("photoTrain"); // Start the photo train
@@ -150,7 +150,7 @@ const Surprise = () => {
               onClick={handleStartPhotoTrain}
               className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-6 px-10 text-6xl rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 opacity-0"
             >
-              🚂
+              <Train className="h-12 w-12" /> {/* Train SVG icon */}
             </Button>
           </div>
         )}
