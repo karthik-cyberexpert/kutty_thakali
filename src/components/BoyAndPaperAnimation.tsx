@@ -28,10 +28,10 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
     gsap.set(boy, { x: -150, y: screenHeight - 150 }); 
     gsap.set(paper, { x: screenWidth / 2 - 40, y: screenHeight - 100, rotation: -75, opacity: 1 }); 
 
-    const tl = gsap.timeline({ delay: 1.5 }); // Delay to let burst happen
+    const mainTl = gsap.timeline({ delay: 1.5 }); // Delay to let burst happen
 
     // Boy walks to paper
-    tl.to(boy, { x: screenWidth / 2 - 120, duration: 3, ease: 'none' })
+    mainTl.to(boy, { x: screenWidth / 2 - 120, duration: 3, ease: 'none' })
       .to(boy, { y: '+=10', duration: 0.2, yoyo: true, repeat: 1 }, '-=0.3')
       .to(paper, { y: screenHeight - 160, x: screenWidth / 2 - 100, rotation: 0, duration: 0.2 }, '<')
       .to(boy, { x: '+=30', duration: 0.5 }, '+=0.2')
@@ -50,27 +50,36 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
         ease: 'power2.in',
         opacity: 1,
         onComplete: () => {
-          onPaperCover(); // Screen is now fully covered by the paper
+          onPaperCover(); // Screen is now fully covered by the paper, PhotoTrain starts rendering
           setShowWipeStrips(true); // Trigger rendering of wipe strips
-          gsap.set(paper, { opacity: 0, display: 'none' }); // Hide the original paper immediately
-          
-          // Start the wiping animation
-          const wipeTl = gsap.timeline({ onComplete: onComplete }); // This timeline handles the wipes
-          
-          wipeStripRefs.current.forEach((strip, i) => {
-            if (!strip) return;
-            const isLeftToRight = i % 2 === 0; // Even index: L-R, Odd index: R-L
-            
-            if (isLeftToRight) {
-              gsap.set(strip, { transformOrigin: 'left center', x: 0, width: '100%' }); // Ensure initial state
-              wipeTl.to(strip, { width: 0, duration: 0.8, ease: 'power1.inOut' }, i * 1); // Stagger by 1s
-            } else {
-              gsap.set(strip, { transformOrigin: 'right center', x: 0, width: '100%' }); // Ensure initial state, start from right
-              wipeTl.to(strip, { width: 0, x: '100%', duration: 0.8, ease: 'power1.inOut' }, i * 1); // Stagger by 1s
-            }
-          });
         },
-      }, '+=0.2'); // Slight delay after boy throws
+      }, '+=0.2')
+      // After paper covers, start the wipe animation
+      .add(() => {
+        // This ensures wipe strips are rendered before their animation starts
+        const wipeTl = gsap.timeline({ onComplete: onComplete }); // This timeline handles the wipes and the final onComplete
+        
+        // Fade out the original paper quickly as the wipes start
+        wipeTl.to(paper, { opacity: 0, duration: 0.2 }, 0)
+              .set(paper, { display: 'none' }); // Then hide it completely
+
+        // Animate the wipe strips
+        wipeStripRefs.current.forEach((strip, i) => {
+          if (!strip) return;
+          const isLeftToRight = i % 2 === 0;
+          
+          // Ensure strips are initially fully visible
+          gsap.set(strip, { opacity: 1 }); 
+
+          if (isLeftToRight) {
+            gsap.set(strip, { transformOrigin: 'left center', x: 0, width: '100%' });
+            wipeTl.to(strip, { width: 0, duration: 0.8, ease: 'power1.inOut' }, i * 1 + 0.2); // Stagger by 1s, start after paper fades
+          } else {
+            gsap.set(strip, { transformOrigin: 'right center', x: 0, width: '100%' });
+            wipeTl.to(strip, { width: 0, x: '100%', duration: 0.8, ease: 'power1.inOut' }, i * 1 + 0.2); // Stagger by 1s, start after paper fades
+          }
+        });
+      }, '+=0.5'); // Add a small delay after paper covers before starting the wipe sequence
 
   }, [onComplete, onPaperCover]);
 
