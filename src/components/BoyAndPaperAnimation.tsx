@@ -37,22 +37,22 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
       .to(paper, { x: '+=30', duration: 0.5 }, '<') // Paper shifts with boy
       // Paper flies to screen and covers it
       .to(paper, {
-        x: '50%', // Use percentage of parent (which is full screen)
-        y: '50%', // Use percentage of parent
+        x: '50vw', // Move center to 50% viewport width
+        y: '50vh', // Move center to 50% viewport height
         xPercent: -50, // Adjust for element's own width to truly center
         yPercent: -50, // Adjust for element's own height to truly center
-        width: '200vw', // Ensure it covers more than 100%
-        height: '200vh', // Ensure it covers more than 100%
+        width: '300vw', // Ensure it covers more than 100%
+        height: '300vh', // Ensure it covers more than 100%
         borderRadius: 0,
         rotation: 720, // More rotation for dramatic effect
-        duration: 1.5, // Slower flight
+        duration: 1.0, // Slightly faster flight to cover quickly
         ease: 'power2.in',
         onComplete: onPaperCover, // Trigger when paper has FINISHED covering
       }, '+=0.2') // Slight delay after boy throws
       // Paper falls down slowly
       .to(paper, {
         y: screenHeight * 1.5, // Fall far off-screen
-        duration: 2.5, // Slower fall
+        duration: 3.5, // Slower fall to reveal PhotoTrain more gradually
         ease: 'power1.in'
       }, '+=0.5'); // Pause for a moment after covering before falling
   }, [onComplete, onPaperCover]);
@@ -66,7 +66,8 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
         style={{ 
           width: '80px', 
           height: '100px', 
-          transformOrigin: 'center center'
+          transformOrigin: 'center center',
+          zIndex: 100 // Ensure paper is on top
         }}
       />
     </div>
