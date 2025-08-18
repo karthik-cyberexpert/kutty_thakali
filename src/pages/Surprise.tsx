@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { gsap } from "gsap";
 import ParticlesBackground from "@/components/ParticlesBackground";
@@ -17,7 +17,7 @@ const Surprise = () => {
   const { name } = useParams();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [hasPlayedIntroAnimation, setHasPlayedIntroAnimation] = useState(false); // New state to track if intro played
+  const [hasPlayedIntroAnimation, setHasPlayedIntroAnimation] = useState(false);
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
@@ -49,21 +49,21 @@ const Surprise = () => {
     }
   }, [animationPhase]);
 
-  const handleGiftOpen = () => {
+  const handleGiftOpen = useCallback(() => {
     setIsTransitioning(true);
-  };
+  }, []);
 
-  const handlePhotoTrainComplete = () => {
+  const handlePhotoTrainComplete = useCallback(() => {
     setAnimationPhase("finalMessage");
-  };
+  }, []);
 
-  const handleReplay = () => {
+  const handleReplay = useCallback(() => {
     setIsTransitioning(false);
     setAnimationPhase('gift');
-    // Do NOT reset hasPlayedIntroAnimation, so the boy/paper animation doesn't replay
-  };
+    // hasPlayedIntroAnimation remains true
+  }, []);
 
-  const handleReveal = () => {
+  const handleReveal = useCallback(() => {
     const message = messageRef.current;
     const revealButton = revealButtonRef.current;
     const replayButton = replayButtonRef.current;
@@ -96,7 +96,16 @@ const Surprise = () => {
         })
         .to(replayButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' });
     }
-  };
+  }, []);
+
+  const handleBoyAndPaperAnimationComplete = useCallback(() => {
+    setIsTransitioning(false);
+    setHasPlayedIntroAnimation(true); // Mark intro as played
+  }, []);
+
+  const handleBoyAndPaperAnimationPaperCover = useCallback(() => {
+    setAnimationPhase('photoTrain');
+  }, []);
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
@@ -142,11 +151,8 @@ const Surprise = () => {
         <div className="absolute inset-0 z-20">
           <GiftBurst />
           <BoyAndPaperAnimation
-            onPaperCover={() => setAnimationPhase('photoTrain')}
-            onComplete={() => {
-              setIsTransitioning(false);
-              setHasPlayedIntroAnimation(true); // Mark intro as played
-            }}
+            onPaperCover={handleBoyAndPaperAnimationPaperCover}
+            onComplete={handleBoyAndPaperAnimationComplete}
           />
         </div>
       )}
