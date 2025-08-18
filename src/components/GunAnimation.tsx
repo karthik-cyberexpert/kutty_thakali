@@ -10,9 +10,9 @@ const GunAnimation: React.FC<GunAnimationProps> = ({ onShotComplete }) => {
   const gunRef = useRef<HTMLDivElement>(null);
   const bulletRef = useRef<HTMLDivElement>(null);
 
-  // Define the target position for the bullet hole (center-right of the screen)
-  const holeTargetX = window.innerWidth * 0.75; // 75% from left
-  const holeTargetY = window.innerHeight * 0.5; // 50% from top
+  // Define the target position for the bullet hole (center of the screen)
+  const holeTargetX = window.innerWidth * 0.5; // Changed to center horizontally
+  const holeTargetY = window.innerHeight * 0.5; // Already centered vertically
 
   useEffect(() => {
     const gun = gunRef.current;
