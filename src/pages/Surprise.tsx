@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import ParticlesBackground from "@/components/ParticlesBackground";
@@ -16,7 +16,6 @@ type AnimationPhase = "gift" | "photos" | "character" | "finalMessage";
 const Surprise = () => {
   const { name } = useParams();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [path, setPath] = useState("");
   const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -26,9 +25,7 @@ const Surprise = () => {
   const backButtonRef = useRef<HTMLButtonElement>(null);
 
   const images = Array.from({ length: 23 }, (_, i) => `https://picsum.photos/seed/${i + 1}/200`);
-  
-  const customMessage = searchParams.get('message');
-  const birthdayMessage = customMessage || `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
+  const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
 
   useEffect(() => {
     const updatePath = () => {
