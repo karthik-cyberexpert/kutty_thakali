@@ -37,12 +37,12 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
       .to(paper, { x: '+=30', duration: 0.5 }, '<') // Paper shifts with boy
       // Paper flies to screen and covers it
       .to(paper, {
-        x: '50vw', // Move center to 50% viewport width
-        y: '50vh', // Move center to 50% viewport height
+        x: '50%', // Use percentage of parent (which is full screen)
+        y: '50%', // Use percentage of parent
         xPercent: -50, // Adjust for element's own width to truly center
         yPercent: -50, // Adjust for element's own height to truly center
-        width: '120vw', // Ensure it covers more than 100%
-        height: '120vh', // Ensure it covers more than 100%
+        width: '200vw', // Ensure it covers more than 100%
+        height: '200vh', // Ensure it covers more than 100%
         borderRadius: 0,
         rotation: 720, // More rotation for dramatic effect
         duration: 1.5, // Slower flight
@@ -63,7 +63,11 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
       <div 
         ref={paperRef} 
         className="absolute bg-white rounded-md shadow-2xl"
-        style={{ width: '80px', height: '100px', transformOrigin: 'center center' }}
+        style={{ 
+          width: '80px', 
+          height: '100px', 
+          transformOrigin: 'center center'
+        }}
       />
     </div>
   );
