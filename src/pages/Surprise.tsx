@@ -20,7 +20,7 @@ const Surprise = () => {
   const messageRef = useRef<HTMLDivElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
 
-  const images = Array.from({ length: 5 }, (_, i) => `/images/image-${i + 1}.svg`);
+  const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
 
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
 
