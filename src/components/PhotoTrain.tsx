@@ -24,6 +24,7 @@ const PhotoTrain: React.FC<PhotoTrainProps> = ({ images, onComplete }) => {
     });
 
     const tl = gsap.timeline({
+      delay: 0.5, // Wait for paper to start falling before starting
       onComplete: () => {
         setTimeout(onComplete, 1000);
       },

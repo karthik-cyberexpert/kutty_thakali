@@ -26,7 +26,7 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
     const tl = gsap.timeline({ onComplete, delay: 1.5 }); // Delay to let burst happen
 
     // Boy walks to paper
-    tl.to(boy, { x: screenWidth / 2 - 80, duration: 3, ease: 'none' })
+    tl.to(boy, { x: screenWidth / 2 - 80, duration: 4, ease: 'none' })
       // Boy picks up paper
       .to(boy, { y: '+=10', duration: 0.2, yoyo: true, repeat: 1 }, '-=0.3')
       .to(paper, { y: screenHeight - 160, x: screenWidth / 2 - 60, rotation: 0, duration: 0.2 }, '<')
@@ -37,20 +37,20 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
       .to(paper, {
         x: screenWidth / 2,
         y: screenHeight / 2,
-        width: '100vw',
-        height: '100vh',
+        width: '110vw',
+        height: '110vh',
         borderRadius: 0,
         rotation: 360,
-        duration: 0.7,
+        duration: 1.2,
         ease: 'power2.in',
-        onStart: onPaperCover, // Callback when paper covers the screen
+        onComplete: onPaperCover, // Trigger when paper has FINISHED covering
       }, '-=0.5')
       // Paper falls down
       .to(paper, {
         y: screenHeight * 1.5,
-        duration: 0.8,
+        duration: 2,
         ease: 'power1.in'
-      }, '+=0.3');
+      }, '+=0.5'); // Pause for a moment before falling
 
   }, [onComplete, onPaperCover]);
 
