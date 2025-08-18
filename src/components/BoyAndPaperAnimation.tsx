@@ -22,8 +22,8 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
     // Initial positions
     // Boy starts off-screen left, at the bottom
     gsap.set(boy, { x: -150, y: screenHeight - 150 }); 
-    // Paper starts on the "floor" near the center, slightly rotated
-    gsap.set(paper, { x: screenWidth / 2 - 40, y: screenHeight - 100, rotation: -75 }); 
+    // Paper starts on the "floor" near the center, slightly rotated, and visible
+    gsap.set(paper, { x: screenWidth / 2 - 40, y: screenHeight - 100, rotation: -75, opacity: 1 }); 
 
     const tl = gsap.timeline({ onComplete, delay: 1.5 }); // Delay to let burst happen
 
@@ -47,6 +47,7 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
         rotation: 720, // More rotation for dramatic effect
         duration: 1.0, // Slightly faster flight to cover quickly
         ease: 'power2.in',
+        opacity: 1, // Explicitly ensure opacity is 1 during cover
         onComplete: onPaperCover, // Trigger when paper has FINISHED covering
       }, '+=0.2') // Slight delay after boy throws
       // Paper falls down slowly
