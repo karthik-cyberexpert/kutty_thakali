@@ -5,7 +5,7 @@ import ParticlesBackground from '@/components/ParticlesBackground';
 import GunAnimation from '@/components/GunAnimation';
 import BulletHole from '@/components/BulletHole';
 import PhotoTrain from '@/components/PhotoTrain';
-import MailboxAndLetter from '@/components/MailboxAndLetter'; // Import the new component
+import MailboxAndLetter from '@/components/MailboxAndLetter';
 import { Target } from 'lucide-react';
 import { gsap } from 'gsap';
 
@@ -62,10 +62,7 @@ const MailContent = () => {
 
       {(currentPhase === 'initialShoot' || currentPhase === 'shooting' || currentPhase === 'photos') && (
         <div className="relative z-10 text-center text-white">
-          <h1 className="text-4xl md:text-6xl font-bold mb-8 animate-fade-in-down">
-            A Special Message for {name}!
-          </h1>
-
+          {/* Removed the h1 tag that displayed the message */}
           {currentPhase === 'initialShoot' && (
             <Button
               onClick={handleShootNow}
