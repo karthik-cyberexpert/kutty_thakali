@@ -2,14 +2,14 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import ParticlesBackground from '@/components/ParticlesBackground';
-import GunAnimation from '@/components/GunAnimation';
 import BulletHole from '@/components/BulletHole';
-import PhotoTrain from '@/components/PhotoTrain';
 import MailboxAndLetter from '@/components/MailboxAndLetter';
 import { Target } from 'lucide-react';
 import { gsap } from 'gsap';
+import ClickableGun from '@/components/ClickableGun'; // New import
+import ShotImage from '@/components/ShotImage'; // New import
 
-type MailContentPhase = 'mailbox' | 'initialShoot' | 'shooting' | 'photos';
+type MailContentPhase = 'mailbox' | 'initialShoot' | 'gunActive'; // Simplified phases
 
 const MailContent = () => {
   const { name } = useParams();
@@ -19,8 +19,14 @@ const MailContent = () => {
   const [currentPhase, setCurrentPhase] = useState<MailContentPhase>(
     location.state?.fromMailOpen ? 'mailbox' : 'initialShoot'
   );
+  const [currentShotIndex, setCurrentShotIndex] = useState(0); // Tracks how many images have been shot
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
+
   const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
+
+  // Define the static target position for the bullet hole (center-right of the screen)
+  const holeTargetX = window.innerWidth * 0.75;
+  const holeTargetY = window.innerHeight * 0.5;
 
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
 
@@ -29,22 +35,32 @@ const MailContent = () => {
   }, []);
 
   const handleShootNow = useCallback(() => {
-    setCurrentPhase('shooting'); // Transition to shooting phase
-  }, []);
+    setCurrentPhase('gunActive');
+    // Set the bullet hole position immediately when gun becomes active
+    setBulletHolePosition({ x: holeTargetX, y: holeTargetY });
+  }, [holeTargetX, holeTargetY]);
 
-  const handleGunShotComplete = useCallback((holePos: { x: number; y: number }) => {
-    setBulletHolePosition(holePos);
-    setCurrentPhase('photos'); // Transition to photos phase
-  }, []);
+  const handleGunClick = useCallback(() => {
+    if (currentShotIndex < images.length) {
+      setCurrentShotIndex(prevIndex => prevIndex + 1);
+    }
+  }, [currentShotIndex, images.length]);
 
-  const handlePhotoTrainComplete = useCallback(() => {
-    // After photo train, navigate back to Surprise page to show final message
-    navigate(`/surprise/${name}`, { state: { phase: 'finalMessage' } });
-  }, [name, navigate]);
-
-  // Effect to handle initial animation of the page content (for shoot/photos phases)
+  // Effect to check if all images have been shot
   useEffect(() => {
-    if (currentPhase === 'initialShoot' || currentPhase === 'shooting' || currentPhase === 'photos') {
+    if (currentShotIndex === images.length && currentShotIndex > 0) {
+      // All images shot, now transition to final message
+      // Add a small delay to let the last image settle
+      const timer = setTimeout(() => {
+        navigate(`/surprise/${name}`, { state: { phase: 'finalMessage' } });
+      }, 1500); // Adjust delay as needed
+      return () => clearTimeout(timer);
+    }
+  }, [currentShotIndex, images.length, name, navigate]);
+
+  // Effect for initial page content animation (already exists)
+  useEffect(() => {
+    if (currentPhase === 'initialShoot' || currentPhase === 'gunActive') {
       gsap.fromTo(".mail-content-container",
         { opacity: 0, y: 50 },
         { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
@@ -60,9 +76,8 @@ const MailContent = () => {
         <MailboxAndLetter birthdayMessage={birthdayMessage} onClose={handleMailboxClose} />
       )}
 
-      {(currentPhase === 'initialShoot' || currentPhase === 'shooting' || currentPhase === 'photos') && (
+      {(currentPhase === 'initialShoot' || currentPhase === 'gunActive') && (
         <div className="relative z-10 text-center text-white">
-          {/* Removed the h1 tag that displayed the message */}
           {currentPhase === 'initialShoot' && (
             <Button
               onClick={handleShootNow}
@@ -72,11 +87,19 @@ const MailContent = () => {
             </Button>
           )}
 
-          {(currentPhase === 'shooting' || currentPhase === 'photos') && (
+          {currentPhase === 'gunActive' && bulletHolePosition && (
             <>
-              {currentPhase === 'shooting' && !bulletHolePosition && <GunAnimation onShotComplete={handleGunShotComplete} />}
-              {bulletHolePosition && <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />}
-              {bulletHolePosition && <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />}
+              <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />
+              <ClickableGun onGunClick={handleGunClick} holePosition={bulletHolePosition} />
+              {/* Render previously shot images */}
+              {Array.from({ length: currentShotIndex }).map((_, index) => (
+                <ShotImage
+                  key={index}
+                  src={images[index]}
+                  holePosition={bulletHolePosition}
+                  index={index} // Pass index to stagger animation
+                />
+              ))}
             </>
           )}
         </div>
