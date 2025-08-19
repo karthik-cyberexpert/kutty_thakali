@@ -10,16 +10,15 @@ interface GiftBoxProps {
 const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className }, ref) => {
   const giftBoxRef = useRef<HTMLDivElement>(null);
   const lidRef = useRef<HTMLDivElement>(null);
-  const baseRef = useRef<HTMLDivElement>(null);
+  const baseRef = useRef<HTMLDivElement>(null); 
 
   useImperativeHandle(ref, () => giftBoxRef.current!);
 
   const handleClick = () => {
     const gift = giftBoxRef.current;
     const lid = lidRef.current;
-    const base = baseRef.current;
 
-    if (!gift || !lid || !base) return;
+    if (!gift || !lid) return;
 
     // Disable further clicks
     gift.style.pointerEvents = 'none';
@@ -30,7 +29,7 @@ const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className },
 
     const tl = gsap.timeline({
       onComplete: () => {
-        onOpen({ x: centerX, y: centerY });
+        onOpen({ x: centerX, y: centerY }); // Call onOpen after lid animation
       }
     });
 
@@ -49,21 +48,7 @@ const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className },
       onComplete: () => {
         lid.style.display = 'none'; // Hide lid after animation
       }
-    }, "-=0.2") // Start fading lid slightly before it finishes moving
-    .to(base, {
-      scale: 1.1, // Slightly scale up the base
-      duration: 0.2,
-      ease: 'power1.inOut',
-    }, "<") // Start at the same time as lid fade
-    .to(base, {
-      scale: 0, // Shrink and fade out the base
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power2.in',
-      onComplete: () => {
-        base.style.display = 'none'; // Hide base after animation
-      }
-    }, "-=0.1"); // Start shrinking base slightly before lid finishes fading
+    }, "-=0.2"); 
   };
 
   return (
@@ -78,7 +63,7 @@ const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className },
     >
       {/* Gift Box Base */}
       <div
-        ref={baseRef}
+        ref={baseRef} 
         className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-3/4 bg-yellow-500 rounded-lg border-4 border-red-600"
         style={{ boxShadow: 'inset 0 -5px 10px rgba(0,0,0,0.2)' }}
       >

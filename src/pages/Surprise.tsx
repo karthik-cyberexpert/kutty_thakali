@@ -20,14 +20,15 @@ const Surprise = () => {
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [showShootButton, setShowShootButton] = useState(false);
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
-  const [burstOrigin, setBurstOrigin] = useState<{ x: number; y: number } | null>(null); // State to store burst origin
+  const [burstOrigin, setBurstOrigin] = useState<{ x: number; y: number } | null>(null); 
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
   const revealButtonRef = useRef<HTMLButtonElement>(null);
   const shootButtonRef = useRef<HTMLButtonElement>(null);
-  const giftBoxRef = useRef<HTMLDivElement>(null); // Ref for the GiftBox component
+  const giftBoxRef = useRef<HTMLDivElement>(null); 
+  const mainContentRef = useRef<HTMLDivElement>(null); 
 
   const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
 
@@ -61,24 +62,40 @@ const Surprise = () => {
   }, [animationPhase, showShootButton]);
 
   const handleGiftOpen = useCallback((position: { x: number; y: number }) => {
-    setBurstOrigin(position); // Set the origin for the burst
-    setAnimationPhase("bursting"); // Transition to bursting phase
+    setBurstOrigin(position); 
+    setAnimationPhase("bursting"); 
   }, []);
 
   const handleBurstComplete = useCallback(() => {
-    setAnimationPhase("boyAnimation"); // Transition to boy animation after burst
+    const mainContentElement = mainContentRef.current; 
+
+    if (mainContentElement) {
+        gsap.to(mainContentElement, {
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power2.in',
+            onComplete: () => {
+                setAnimationPhase("boyAnimation"); 
+            }
+        });
+    } else {
+        setAnimationPhase("boyAnimation"); 
+    }
   }, []);
 
   const handlePhotoTrainComplete = useCallback(() => {
     setAnimationPhase("finalMessage");
-    setBulletHolePosition(null); // Hide the hole after photo train
+    setBulletHolePosition(null); 
   }, []);
 
   const handleReplay = useCallback(() => {
     setAnimationPhase('gift');
     setShowShootButton(false);
-    setBulletHolePosition(null); // Ensure hole is hidden on replay
-    setBurstOrigin(null); // Reset burst origin on replay
+    setBulletHolePosition(null); 
+    setBurstOrigin(null); 
+    if (mainContentRef.current) {
+        gsap.set(mainContentRef.current, { opacity: 1, display: 'flex' });
+    }
   }, []);
 
   const handleReveal = useCallback(() => {
@@ -140,60 +157,40 @@ const Surprise = () => {
       <ParticlesBackground />
       <AudioPlayer src="/birthday-music.mp3" />
 
-      <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
-        {animationPhase === 'gift' && (
+      {/* Main content div that holds the gift box and initial message */}
+      {(animationPhase === 'gift' || animationPhase === 'bursting') && (
+        <div ref={mainContentRef} className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div className="flex flex-col items-center animate-fade-in-down">
             <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
             <GiftBox ref={giftBoxRef} onOpen={handleGiftOpen} />
           </div>
-        )}
+        </div>
+      )}
 
-        {animationPhase === 'preShootButton' && showShootButton && (
-          <div className="flex flex-col items-center">
-            <h2 className="text-3xl md:text-5xl font-bold mb-8 animate-fade-in-down">Ready for more magic?</h2>
-            <Button
-              ref={shootButtonRef}
-              onClick={handleShoot}
-              className="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-bold py-6 px-10 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 opacity-0"
-            >
-              Shoot! 🔫
-            </Button>
-          </div>
-        )}
-
-        {animationPhase === "finalMessage" && (
-          <div className="flex flex-col items-center">
-            <div ref={finalGiftRef} className="text-8xl">🎁</div>
-            {finalGiftRef.current && gsap.getProperty(finalGiftRef.current, "opacity") === 0 && <Confetti />}
-            <div 
-              ref={messageRef} 
-              className="font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400"
-              style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
-            >
-              {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>)}
-            </div>
-            <div className="mt-8 h-12 relative min-w-[240px]">
-              <Button ref={revealButtonRef} onClick={handleReveal} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
-                <Eye className="mr-2 h-4 w-4" /> Reveal Message
-              </Button>
-              <Button ref={replayButtonRef} onClick={handleReplay} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
-                <RefreshCw className="mr-2 h-4 w-4" /> Replay
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Full-screen animations are now siblings to the main content div */}
+      {/* GiftBurst renders on top of the gift box during the 'bursting' phase */}
       {animationPhase === 'bursting' && burstOrigin && (
         <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} onComplete={handleBurstComplete} />
       )}
 
+      {/* Other animations are rendered based on their respective phases */}
       {animationPhase === 'boyAnimation' && (
         <BoyAndPaperAnimation
           onPaperCover={handleBoyAndPaperAnimationPaperCover}
           onComplete={handleBoyAndPaperAnimationComplete}
         />
+      )}
+
+      {animationPhase === 'preShootButton' && showShootButton && (
+        <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
+          <h2 className="text-3xl md:text-5xl font-bold mb-8 animate-fade-in-down">Ready for more magic?</h2>
+          <Button
+            ref={shootButtonRef}
+            onClick={handleShoot}
+            className="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-bold py-6 px-10 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 opacity-0"
+          >
+            Shoot! 🔫
+          </Button>
+        </div>
       )}
 
       {animationPhase === 'shooting' && (
@@ -205,6 +202,28 @@ const Surprise = () => {
           <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />
           <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />
         </>
+      )}
+
+      {animationPhase === "finalMessage" && (
+        <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
+          <div ref={finalGiftRef} className="text-8xl">🎁</div>
+          {finalGiftRef.current && gsap.getProperty(finalGiftRef.current, "opacity") === 0 && <Confetti />}
+          <div 
+            ref={messageRef} 
+            className="font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400"
+            style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
+          >
+            {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>)}
+          </div>
+          <div className="mt-8 h-12 relative min-w-[240px]">
+            <Button ref={revealButtonRef} onClick={handleReveal} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
+              <Eye className="mr-2 h-4 w-4" /> Reveal Message
+            </Button>
+            <Button ref={replayButtonRef} onClick={handleReplay} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
+              <RefreshCw className="mr-2 h-4 w-4" /> Replay
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );
