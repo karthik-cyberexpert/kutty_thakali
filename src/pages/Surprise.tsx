@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import ParticlesBackground from "@/components/ParticlesBackground";
 import GiftBox from "@/components/GiftBox";
@@ -7,25 +7,23 @@ import Confetti from "@/components/Confetti";
 import AudioPlayer from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Eye } from "lucide-react";
-import PhotoTrain from "@/components/PhotoTrain";
 import GiftBurst from "@/components/GiftBurst";
-import WaveTransition from "@/components/WaveTransition";
-import GunAnimation from "@/components/GunAnimation";
-import BulletHole from "@/components/BulletHole";
 import Bomb from "@/components/Bomb";
 import CountdownTimer from "@/components/CountdownTimer";
 import Mail from "@/components/Mail";
 
-type AnimationPhase = "gift" | "bombThrown" | "timerCountdown" | "explosion" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "bombThrown" | "timerCountdown" | "explosion" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation(); // To read state from navigation
+
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [bombPosition, setBombPosition] = useState<{ x: number; y: number } | null>(null);
   const [explosionOrigin, setExplosionOrigin] = useState<{ x: number; y: number } | null>(null);
-  const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
-  const [isGiftBurstFading, setIsGiftBurstFading] = useState(false); // New state to control GiftBurst fade out
-  const [showMailText, setShowMailText] = useState(false); // New state to control Mail text animation
+  const [isGiftBurstFading, setIsGiftBurstFading] = useState(false);
+  const [showMailText, setShowMailText] = useState(false);
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
@@ -33,9 +31,19 @@ const Surprise = () => {
   const revealButtonRef = useRef<HTMLButtonElement>(null);
   const mainContentRef = useRef<HTMLDivElement>(null);
 
-  const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
-
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
+
+  // Effect to handle navigation state for final message
+  useEffect(() => {
+    if (location.state?.phase === 'finalMessage') {
+      setAnimationPhase('finalMessage');
+      // Clear any previous states that might interfere
+      setBombPosition(null);
+      setExplosionOrigin(null);
+      setIsGiftBurstFading(false);
+      setShowMailText(false);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (animationPhase === "finalMessage") {
@@ -74,30 +82,22 @@ const Surprise = () => {
   }, []);
 
   const handleMailClick = useCallback(() => {
+    // This is called when the Mail icon is clicked
     setIsGiftBurstFading(true); // Trigger GiftBurst particles to fade out
     setShowMailText(true); // Trigger "Open Mail!" text animation
   }, []);
 
-  const handleGiftBurstFadeOutComplete = useCallback(() => {
-    // This callback is fired when GiftBurst particles have completely faded out
-    setAnimationPhase("photoTrain"); // Now transition to the next phase
-    setBulletHolePosition(null); // Reset bullet hole position for next animation
-    setIsGiftBurstFading(false); // Reset state for replay
-    setShowMailText(false); // Reset state for replay
-  }, []);
-
-  const handlePhotoTrainComplete = useCallback(() => {
-    setAnimationPhase("finalMessage");
-    setBulletHolePosition(null);
-  }, []);
+  const handleMailOpenComplete = useCallback(() => {
+    // This is called after the Mail opening animation finishes
+    navigate(`/mail-content/${name}`); // Navigate to the new page
+  }, [name, navigate]);
 
   const handleReplay = useCallback(() => {
     setAnimationPhase('gift');
     setBombPosition(null);
     setExplosionOrigin(null);
-    setBulletHolePosition(null);
-    setIsGiftBurstFading(false); // Reset state
-    setShowMailText(false); // Reset state
+    setIsGiftBurstFading(false);
+    setShowMailText(false);
     if (mainContentRef.current) {
         gsap.set(mainContentRef.current, { opacity: 1, display: 'flex' });
     }
@@ -138,12 +138,6 @@ const Surprise = () => {
     }
   }, []);
 
-  const handleGunShotComplete = useCallback((holePos: { x: number; y: number }) => {
-    setBulletHolePosition(holePos);
-    setAnimationPhase("photoTrain");
-  }, []);
-
-
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       <ParticlesBackground />
@@ -176,18 +170,13 @@ const Surprise = () => {
             originX={explosionOrigin.x}
             originY={explosionOrigin.y}
             fadeAway={isGiftBurstFading} // Control fade out via state
-            onFadeOutComplete={handleGiftBurstFadeOutComplete} // Callback when fade out is done
           />
-          <Mail onMailClick={handleMailClick} showText={showMailText} /> {/* Mail appears with particles */}
-        </>
-      )}
-
-      {/* Phase: Photo Train (after mail click and burst fade out) */}
-      {animationPhase === 'photoTrain' && (
-        <>
-            {!bulletHolePosition && <GunAnimation onShotComplete={handleGunShotComplete} />}
-            {bulletHolePosition && <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />}
-            {bulletHolePosition && <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />}
+          <Mail
+            explosionOrigin={explosionOrigin} // Pass origin for scattering
+            onMailClick={handleMailClick}
+            showText={showMailText}
+            onMailOpenComplete={handleMailOpenComplete}
+          />
         </>
       )}
 
