@@ -33,8 +33,10 @@ const Bomb: React.FC<BombProps> = ({ initialX, initialY, onBombClick }) => {
 
     // Bomb flies out and lands in the center of the screen
     tl.to(bomb, {
-      x: '50vw', // Use viewport units for robust centering
-      y: '50vh', // Use viewport units for robust centering
+      x: '50vw', // Target top-left to 50% viewport width
+      y: '50vh', // Target top-left to 50% viewport height
+      xPercent: -50, // Shift back by half its own width to center it
+      yPercent: -50, // Shift back by half its own height to center it
       scale: 1,
       opacity: 1,
       duration: 0.8,
