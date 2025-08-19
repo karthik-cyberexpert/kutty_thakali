@@ -9,19 +9,23 @@ interface GiftBoxProps {
 
 const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className }, ref) => {
   const giftBoxRef = useRef<HTMLDivElement>(null);
-  const lidTopRef = useRef<HTMLDivElement>(null);
-  const lidBottomRef = useRef<HTMLDivElement>(null);
+  const borderTopRef = useRef<HTMLDivElement>(null);
+  const borderBottomRef = useRef<HTMLDivElement>(null);
+  const borderLeftRef = useRef<HTMLDivElement>(null);
+  const borderRightRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref, () => giftBoxRef.current!);
 
   const handleClick = () => {
     const gift = giftBoxRef.current;
-    const lidTop = lidTopRef.current;
-    const lidBottom = lidBottomRef.current;
+    const borderTop = borderTopRef.current;
+    const borderBottom = borderBottomRef.current;
+    const borderLeft = borderLeftRef.current;
+    const borderRight = borderRightRef.current;
     const glow = glowRef.current;
 
-    if (!gift || !lidTop || !lidBottom || !glow) return;
+    if (!gift || !borderTop || !borderBottom || !borderLeft || !borderRight || !glow) return;
 
     // Disable further clicks
     gift.style.pointerEvents = 'none';
@@ -32,44 +36,41 @@ const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className },
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // After the initial opening, fade out the box elements to make way for the burst
-        gsap.to([lidTop, lidBottom, gift], {
+        // Fade out the box elements to make way for the burst
+        gsap.to([borderTop, borderBottom, borderLeft, borderRight, gift], {
           opacity: 0,
           duration: 0.3,
           ease: 'power1.in',
           onComplete: () => {
-            lidTop.style.display = 'none';
-            lidBottom.style.display = 'none';
-            gift.style.display = 'none';
+            // Hide elements completely after fading
+            if (borderTop) borderTop.style.display = 'none';
+            if (borderBottom) borderBottom.style.display = 'none';
+            if (borderLeft) borderLeft.style.display = 'none';
+            if (borderRight) borderRight.style.display = 'none';
+            if (gift) gift.style.display = 'none';
           }
         });
-        onOpen({ x: centerX, y: centerY }); // Call onOpen after lid animation
+        onOpen({ x: centerX, y: centerY }); // Call onOpen after animation
       }
     });
 
-    // Animate the lid panels splitting and moving
-    tl.to(lidTop, {
-      y: '-100%', // Move top lid completely upwards
-      duration: 0.6,
-      ease: 'power2.out',
-    }, 0) // Start at the same time
-    .to(lidBottom, {
-      y: '100%', // Move bottom lid completely downwards
-      duration: 0.6,
-      ease: 'power2.out',
-    }, 0) // Start at the same time
-    // Animate the internal glow
-    .fromTo(glow,
-      { scale: 0, opacity: 0 },
-      { scale: 1.5, opacity: 1, duration: 0.5, ease: 'power2.out' },
-      0.2 // Start glow slightly after lids begin to move
-    )
-    .to(glow, {
-      opacity: 0,
-      scale: 2,
-      duration: 0.4,
-      ease: 'power1.in',
-    }, 0.7); // Fade out glow after it peaks
+    // Animate the borders expanding outwards and fading
+    tl.to(borderTop, { y: '-100%', opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
+      .to(borderBottom, { y: '100%', opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
+      .to(borderLeft, { x: '-100%', opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
+      .to(borderRight, { x: '100%', opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
+      // Animate the internal glow
+      .fromTo(glow,
+        { scale: 0, opacity: 0 },
+        { scale: 1.5, opacity: 1, duration: 0.5, ease: 'power2.out' },
+        0.2 // Start glow slightly after borders begin to move
+      )
+      .to(glow, {
+        opacity: 0,
+        scale: 2,
+        duration: 0.4,
+        ease: 'power1.in',
+      }, 0.7); // Fade out glow after it peaks
   };
 
   return (
@@ -77,39 +78,35 @@ const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className },
       ref={giftBoxRef}
       onClick={handleClick}
       className={cn(
-        "relative w-32 h-32 md:w-40 md:h-40 cursor-pointer transition-transform duration-300 hover:scale-110 overflow-hidden", // Added overflow-hidden
+        "relative w-32 h-32 md:w-40 md:h-40 cursor-pointer transition-transform duration-300 hover:scale-110 overflow-hidden",
         className
       )}
-      style={{ filter: 'drop-shadow(0 0 20px #ff00ff)' }} // Keep the glow effect
+      style={{ filter: 'drop-shadow(0 0 20px #ff00ff)' }}
     >
-      {/* Main Box Body - Futuristic look */}
-      <div className="absolute inset-0 bg-gray-900 rounded-lg border-2 border-purple-700 shadow-lg flex items-center justify-center">
-        {/* Glowing lines/accents */}
-        <div className="absolute w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 top-1/2 -translate-y-1/2 opacity-70" style={{ boxShadow: '0 0 10px #ff00ff' }}></div>
-        <div className="absolute w-1 h-full bg-gradient-to-b from-purple-500 via-pink-500 to-cyan-500 left-1/2 -translate-x-1/2 opacity-70" style={{ boxShadow: '0 0 10px #ff00ff' }}></div>
-      </div>
+      {/* Main Box Body - Dark, subtle background */}
+      <div className="absolute inset-0 bg-gray-950/50 rounded-lg" />
 
-      {/* Lid Top */}
+      {/* Glowing Borders */}
       <div
-        ref={lidTopRef}
-        className="absolute top-0 left-0 w-full h-1/2 bg-gray-800 rounded-t-lg border-t-2 border-x-2 border-purple-600"
-        style={{ transformOrigin: 'bottom center', zIndex: 10 }}
-      >
-        {/* Top part of glowing lines */}
-        <div className="absolute w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 bottom-0 opacity-70" style={{ boxShadow: '0 0 10px #ff00ff' }}></div>
-        <div className="absolute w-1 h-full bg-gradient-to-b from-purple-500 via-pink-500 to-cyan-500 left-1/2 -translate-x-1/2 opacity-70" style={{ boxShadow: '0 0 10px #ff00ff' }}></div>
-      </div>
-
-      {/* Lid Bottom */}
+        ref={borderTopRef}
+        className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500"
+        style={{ boxShadow: '0 0 10px #ff00ff' }}
+      />
       <div
-        ref={lidBottomRef}
-        className="absolute bottom-0 left-0 w-full h-1/2 bg-gray-800 rounded-b-lg border-b-2 border-x-2 border-purple-600"
-        style={{ transformOrigin: 'top center', zIndex: 10 }}
-      >
-        {/* Bottom part of glowing lines */}
-        <div className="absolute w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 top-0 opacity-70" style={{ boxShadow: '0 0 10px #ff00ff' }}></div>
-        <div className="absolute w-1 h-full bg-gradient-to-b from-purple-500 via-pink-500 to-cyan-500 left-1/2 -translate-x-1/2 opacity-70" style={{ boxShadow: '0 0 10px #ff00ff' }}></div>
-      </div>
+        ref={borderBottomRef}
+        className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500"
+        style={{ boxShadow: '0 0 10px #ff00ff' }}
+      />
+      <div
+        ref={borderLeftRef}
+        className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 via-pink-500 to-cyan-500"
+        style={{ boxShadow: '0 0 10px #ff00ff' }}
+      />
+      <div
+        ref={borderRightRef}
+        className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-purple-500 via-pink-500 to-cyan-500"
+        style={{ boxShadow: '0 0 10px #ff00ff' }}
+      />
 
       {/* Internal Glow */}
       <div
