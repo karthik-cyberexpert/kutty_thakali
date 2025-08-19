@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ParticlesBackground from "@/components/ParticlesBackground";
 import { Gift } from "lucide-react";
-import LoadingBarAnimation from "@/components/LoadingBarAnimation"; // Import the new component
+import SliderProgressBar from "@/components/SliderProgressBar"; // Import the new component
 
 const Welcome = () => {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [showLoading, setShowLoading] = useState(false); // New state for loading animation
+  const [showSlider, setShowSlider] = useState(false); // New state to control slider visibility
   const navigate = useNavigate();
 
   const handleAnimationComplete = useCallback(() => {
@@ -21,7 +21,7 @@ const Welcome = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim().toLowerCase() === "kutty thakali") {
-      setShowLoading(true); // Show loading animation
+      setShowSlider(true); // Show the slider when correct name is entered
     } else {
       setError("Enter: Kutty Thakali");
     }
@@ -53,14 +53,14 @@ const Welcome = () => {
             <Button
               type="submit"
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 mt-2"
-              disabled={showLoading} // Disable button while loading
+              disabled={showSlider} // Disable button while slider is active
             >
               Let's Go <Gift className="ml-2" />
             </Button>
           </form>
         </div>
       </div>
-      {showLoading && <LoadingBarAnimation onComplete={handleAnimationComplete} />}
+      {showSlider && <SliderProgressBar onComplete={handleAnimationComplete} />}
     </div>
   );
 };
