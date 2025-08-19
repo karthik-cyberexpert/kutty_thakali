@@ -9,11 +9,11 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, Eye } from "lucide-react";
 import PhotoTrain from "@/components/PhotoTrain";
 import GiftBurst from "@/components/GiftBurst";
-import BoyAndPaperAnimation from "@/components/BoyAndPaperAnimation";
+import WaveTransition from "@/components/WaveTransition"; // New import
 import GunAnimation from "@/components/GunAnimation";
 import BulletHole from "@/components/BulletHole";
 
-type AnimationPhase = "gift" | "burstingAndBoyAnimation" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "burstingAndWaveTransition" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
@@ -63,11 +63,8 @@ const Surprise = () => {
 
   const handleGiftOpen = useCallback((position: { x: number; y: number }) => {
     setBurstOrigin(position); 
-    setAnimationPhase("burstingAndBoyAnimation"); 
+    setAnimationPhase("burstingAndWaveTransition"); 
   }, []);
-
-  // handleBurstComplete is no longer needed as a direct phase transition
-  // The BoyAndPaperAnimation's onComplete will handle the next phase.
 
   const handlePhotoTrainComplete = useCallback(() => {
     setAnimationPhase("finalMessage");
@@ -119,12 +116,12 @@ const Surprise = () => {
     }
   }, []);
 
-  const handleBoyAndPaperAnimationComplete = useCallback(() => {
+  const handleWaveTransitionComplete = useCallback(() => {
     setAnimationPhase("preShootButton");
     setShowShootButton(true);
   }, []);
 
-  const handleBoyAndPaperAnimationPaperCover = useCallback(() => {
+  const handleWaveTransitionCover = useCallback(() => {
     // This callback is now responsible for fading out the initial content
     if (mainContentRef.current) {
         gsap.to(mainContentRef.current, {
@@ -154,7 +151,7 @@ const Surprise = () => {
       <AudioPlayer src="/birthday-music.mp3" />
 
       {/* Main content div that holds the gift box and initial message */}
-      {(animationPhase === 'gift' || animationPhase === 'burstingAndBoyAnimation') && (
+      {(animationPhase === 'gift' || animationPhase === 'burstingAndWaveTransition') && (
         <div ref={mainContentRef} className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div className="flex flex-col items-center animate-fade-in-down">
             <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
@@ -163,15 +160,15 @@ const Surprise = () => {
         </div>
       )}
 
-      {/* GiftBurst and BoyAndPaperAnimation render during the combined phase */}
-      {animationPhase === 'burstingAndBoyAnimation' && (
+      {/* GiftBurst and WaveTransition render during the combined phase */}
+      {animationPhase === 'burstingAndWaveTransition' && (
         <>
           {burstOrigin && (
             <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} />
           )}
-          <BoyAndPaperAnimation
-            onPaperCover={handleBoyAndPaperAnimationPaperCover}
-            onComplete={handleBoyAndPaperAnimationComplete}
+          <WaveTransition
+            onCover={handleWaveTransitionCover}
+            onComplete={handleWaveTransitionComplete}
           />
         </>
       )}
