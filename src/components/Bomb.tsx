@@ -31,12 +31,12 @@ const Bomb: React.FC<BombProps> = ({ initialX, initialY, onBombClick }) => {
 
     const tl = gsap.timeline();
 
-    // Bomb flies out and lands
+    // Bomb flies out and lands in the center of the screen
     tl.to(bomb, {
+      x: '50vw', // Use viewport units for robust centering
+      y: '50vh', // Use viewport units for robust centering
       scale: 1,
       opacity: 1,
-      x: window.innerWidth / 2, // Land in the center of the screen
-      y: window.innerHeight / 2,
       duration: 0.8,
       ease: 'back.out(1.7)',
     })
@@ -54,7 +54,9 @@ const Bomb: React.FC<BombProps> = ({ initialX, initialY, onBombClick }) => {
     gsap.to(message, { opacity: 0, y: -20, duration: 0.3 });
     gsap.to(bomb, { opacity: 0, scale: 0.5, duration: 0.3, onComplete: () => {
         bomb.style.display = 'none';
-        onBombClick({ x: bomb.getBoundingClientRect().left + bomb.getBoundingClientRect().width / 2, y: bomb.getBoundingClientRect().top + bomb.getBoundingClientRect().height / 2 });
+        // Pass the current center of the screen as the explosion origin
+        // This ensures the explosion is always centered, regardless of bomb's final DOM position
+        onBombClick({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
     }});
   };
 
