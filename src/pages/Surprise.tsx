@@ -12,11 +12,11 @@ import GiftBurst from "@/components/GiftBurst";
 import WaveTransition from "@/components/WaveTransition";
 import GunAnimation from "@/components/GunAnimation";
 import BulletHole from "@/components/BulletHole";
-import Bomb from "@/components/Bomb"; // New import
-import CountdownTimer from "@/components/CountdownTimer"; // New import
-import Mail from "@/components/Mail"; // New import
+import Bomb from "@/components/Bomb";
+import CountdownTimer from "@/components/CountdownTimer";
+import Mail from "@/components/Mail";
 
-type AnimationPhase = "gift" | "bombThrown" | "timerCountdown" | "explosion" | "mailRevealed" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "bombThrown" | "timerCountdown" | "explosion" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
@@ -24,6 +24,8 @@ const Surprise = () => {
   const [bombPosition, setBombPosition] = useState<{ x: number; y: number } | null>(null);
   const [explosionOrigin, setExplosionOrigin] = useState<{ x: number; y: number } | null>(null);
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
+  const [isGiftBurstFading, setIsGiftBurstFading] = useState(false); // New state to control GiftBurst fade out
+  const [showMailText, setShowMailText] = useState(false); // New state to control Mail text animation
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
@@ -63,23 +65,25 @@ const Surprise = () => {
   }, []);
 
   const handleBombClick = useCallback((position: { x: number; y: number }) => {
-    setExplosionOrigin(position); // Set explosion origin to bomb's position
+    setExplosionOrigin(position);
     setAnimationPhase("timerCountdown");
   }, []);
 
   const handleTimerComplete = useCallback(() => {
-    setAnimationPhase("explosion");
-  }, []);
-
-  const handleExplosionComplete = useCallback(() => {
-    setAnimationPhase("mailRevealed");
+    setAnimationPhase("explosion"); // Transition to explosion phase where particles and mail appear
   }, []);
 
   const handleMailClick = useCallback(() => {
-    // Transition to the next phase after mail is clicked
-    // For now, let's transition to the PhotoTrain phase directly
-    // If you want to re-introduce the "Shoot!" button, we'd add a new phase here.
-    setAnimationPhase("photoTrain");
+    setIsGiftBurstFading(true); // Trigger GiftBurst particles to fade out
+    setShowMailText(true); // Trigger "Open Mail!" text animation
+  }, []);
+
+  const handleGiftBurstFadeOutComplete = useCallback(() => {
+    // This callback is fired when GiftBurst particles have completely faded out
+    setAnimationPhase("photoTrain"); // Now transition to the next phase
+    setBulletHolePosition(null); // Reset bullet hole position for next animation
+    setIsGiftBurstFading(false); // Reset state for replay
+    setShowMailText(false); // Reset state for replay
   }, []);
 
   const handlePhotoTrainComplete = useCallback(() => {
@@ -92,6 +96,8 @@ const Surprise = () => {
     setBombPosition(null);
     setExplosionOrigin(null);
     setBulletHolePosition(null);
+    setIsGiftBurstFading(false); // Reset state
+    setShowMailText(false); // Reset state
     if (mainContentRef.current) {
         gsap.set(mainContentRef.current, { opacity: 1, display: 'flex' });
     }
@@ -132,8 +138,6 @@ const Surprise = () => {
     }
   }, []);
 
-  // Placeholder for GunAnimation and BulletHole if they are still desired later
-  // For now, PhotoTrain will follow Mail.
   const handleGunShotComplete = useCallback((holePos: { x: number; y: number }) => {
     setBulletHolePosition(holePos);
     setAnimationPhase("photoTrain");
@@ -165,21 +169,21 @@ const Surprise = () => {
         <CountdownTimer onComplete={handleTimerComplete} />
       )}
 
-      {/* Phase: Explosion */}
+      {/* Phase: Explosion (particles and mail appear together) */}
       {animationPhase === 'explosion' && explosionOrigin && (
-        <GiftBurst originX={explosionOrigin.x} originY={explosionOrigin.y} onComplete={handleExplosionComplete} />
+        <>
+          <GiftBurst
+            originX={explosionOrigin.x}
+            originY={explosionOrigin.y}
+            fadeAway={isGiftBurstFading} // Control fade out via state
+            onFadeOutComplete={handleGiftBurstFadeOutComplete} // Callback when fade out is done
+          />
+          <Mail onMailClick={handleMailClick} showText={showMailText} /> {/* Mail appears with particles */}
+        </>
       )}
 
-      {/* Phase: Mail Revealed */}
-      {animationPhase === 'mailRevealed' && (
-        <Mail onMailClick={handleMailClick} />
-      )}
-
-      {/* Phase: Photo Train (after mail click) */}
+      {/* Phase: Photo Train (after mail click and burst fade out) */}
       {animationPhase === 'photoTrain' && (
-        // Re-using GunAnimation and BulletHole to trigger PhotoTrain as per previous flow
-        // If you want to remove the gun animation, we can directly call PhotoTrain here
-        // For now, I'll keep the gun animation as a transition to PhotoTrain
         <>
             {!bulletHolePosition && <GunAnimation onShotComplete={handleGunShotComplete} />}
             {bulletHolePosition && <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />}
