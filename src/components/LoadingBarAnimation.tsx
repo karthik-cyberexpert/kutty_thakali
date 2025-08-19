@@ -10,7 +10,7 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
   const girlRef = useRef<HTMLDivElement>(null);
   const percentageRef = useRef<HTMLSpanElement>(null);
   const barContainerRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
+  // Removed `progress` state as it's no longer directly controlling the bar's width via React style
 
   useEffect(() => {
     const bar = barRef.current;
@@ -19,7 +19,6 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
     const barContainer = barContainerRef.current;
 
     if (!bar || !girl || !percentageText || !barContainer) {
-      // If refs are not available, try again on next render or exit
       console.warn("LoadingBarAnimation: Refs not available, skipping animation setup.");
       return;
     }
@@ -28,18 +27,16 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
     gsap.set(girl, { left: '0%', transform: 'translateX(-50%)' });
     gsap.set(percentageText, { textContent: '0%' });
 
-    const duration = 8; // Set animation duration to 8 seconds (between 7 and 10)
+    const duration = 8; // Set animation duration to 8 seconds
 
     const tl = gsap.timeline({
       onUpdate: () => {
         const currentBarWidth = gsap.getProperty(bar, 'width', 'px') as number;
-        // Ensure containerWidth is not zero to prevent NaN
         const containerWidth = barContainer.offsetWidth || 1; 
         const currentProgress = Math.round((currentBarWidth / containerWidth) * 100);
         
-        // Only update if progress is a valid number
         if (!isNaN(currentProgress)) {
-          setProgress(currentProgress);
+          // Only update the text content, let GSAP handle the bar's width directly
           if (percentageText) {
             percentageText.textContent = `${currentProgress}%`;
           }
@@ -62,7 +59,7 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
           <div
             ref={barRef}
             className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
-            style={{ width: `${progress}%` }}
+            // Removed style={{ width: `${progress}%` }} to let GSAP control it directly
           ></div>
           <div
             ref={girlRef}
