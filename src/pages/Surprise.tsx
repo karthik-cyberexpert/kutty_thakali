@@ -94,14 +94,15 @@ const Surprise = () => {
     // This is called after the Mail opening animation finishes
     // We now wait for GiftBurst to fade out before navigating
     // The navigation is handled by handleGiftBurstFadeOutComplete
-  }, []);
+    navigate(`/mail-content/${name}`, { state: { fromMailOpen: true } }); // Navigate to MailContent with state
+  }, [name, navigate]);
 
   const handleGiftBurstFadeOutComplete = useCallback(() => {
     // This callback is fired when GiftBurst particles have completely faded out
-    navigate(`/mail-content/${name}`); // Now navigate to the new page
+    // This navigation is now handled by handleMailOpenComplete
     setIsGiftBurstFading(false); // Reset state for replay
     setShowFindMailText(false); // Ensure this is false
-  }, [name, navigate]);
+  }, []);
 
   const handleReplay = useCallback(() => {
     setAnimationPhase('gift');
