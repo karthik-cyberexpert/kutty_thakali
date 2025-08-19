@@ -14,9 +14,16 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     const mail = mailRef.current;
     if (!mail) return;
 
+    // Define a central area for the mail icon to scatter to
+    const padding = 0.2; // 20% padding from edges
+    const minX = window.innerWidth * padding;
+    const maxX = window.innerWidth * (1 - padding);
+    const minY = window.innerHeight * padding;
+    const maxY = window.innerHeight * (1 - padding);
+
     // Initial random position for the mail icon, scattering from the explosion origin
-    const randomX = gsap.utils.random(0, window.innerWidth);
-    const randomY = gsap.utils.random(0, window.innerHeight);
+    const randomX = gsap.utils.random(minX, maxX);
+    const randomY = gsap.utils.random(minY, maxY);
 
     gsap.set(mail, {
       x: explosionOrigin.x,
@@ -26,7 +33,6 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
       scale: 0,
       opacity: 0,
       rotation: gsap.utils.random(0, 360),
-      // Removed random font size to set a fixed, larger size
     });
 
     const scatterDuration = 1.2;
@@ -79,8 +85,8 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     <div
       ref={mailRef}
       onClick={handleClick}
-      className="absolute z-50 flex flex-col items-center justify-center cursor-pointer text-white text-9xl" // Increased size to text-9xl
-      style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(0,255,255,0.8)' }} // Added strong glowing shadow
+      className="absolute z-50 flex flex-col items-center justify-center cursor-pointer text-white text-7xl" // Reduced size to text-7xl
+      style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(0,255,255,0.8)' }}
     >
       ✉️
     </div>
