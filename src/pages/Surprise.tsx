@@ -13,7 +13,7 @@ import BoyAndPaperAnimation from "@/components/BoyAndPaperAnimation";
 import GunAnimation from "@/components/GunAnimation";
 import BulletHole from "@/components/BulletHole";
 
-type AnimationPhase = "gift" | "bursting" | "boyAnimation" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "burstingAndBoyAnimation" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
@@ -63,14 +63,11 @@ const Surprise = () => {
 
   const handleGiftOpen = useCallback((position: { x: number; y: number }) => {
     setBurstOrigin(position); 
-    setAnimationPhase("bursting"); 
+    setAnimationPhase("burstingAndBoyAnimation"); 
   }, []);
 
-  const handleBurstComplete = useCallback(() => {
-    // No longer fading out mainContentRef here.
-    // It will fade out when the paper covers the screen.
-    setAnimationPhase("boyAnimation"); 
-  }, []);
+  // handleBurstComplete is no longer needed as a direct phase transition
+  // The BoyAndPaperAnimation's onComplete will handle the next phase.
 
   const handlePhotoTrainComplete = useCallback(() => {
     setAnimationPhase("finalMessage");
@@ -157,7 +154,7 @@ const Surprise = () => {
       <AudioPlayer src="/birthday-music.mp3" />
 
       {/* Main content div that holds the gift box and initial message */}
-      {(animationPhase === 'gift' || animationPhase === 'bursting' || animationPhase === 'boyAnimation') && (
+      {(animationPhase === 'gift' || animationPhase === 'burstingAndBoyAnimation') && (
         <div ref={mainContentRef} className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div className="flex flex-col items-center animate-fade-in-down">
             <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
@@ -166,17 +163,17 @@ const Surprise = () => {
         </div>
       )}
 
-      {/* GiftBurst renders during the 'bursting' phase */}
-      {animationPhase === 'bursting' && burstOrigin && (
-        <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} onComplete={handleBurstComplete} />
-      )}
-
-      {/* BoyAndPaperAnimation renders during the 'boyAnimation' phase */}
-      {animationPhase === 'boyAnimation' && (
-        <BoyAndPaperAnimation
-          onPaperCover={handleBoyAndPaperAnimationPaperCover}
-          onComplete={handleBoyAndPaperAnimationComplete}
-        />
+      {/* GiftBurst and BoyAndPaperAnimation render during the combined phase */}
+      {animationPhase === 'burstingAndBoyAnimation' && (
+        <>
+          {burstOrigin && (
+            <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} />
+          )}
+          <BoyAndPaperAnimation
+            onPaperCover={handleBoyAndPaperAnimationPaperCover}
+            onComplete={handleBoyAndPaperAnimationComplete}
+          />
+        </>
       )}
 
       {/* Other animations are rendered based on their respective phases */}
