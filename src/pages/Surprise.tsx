@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, Eye } from "lucide-react";
 import PhotoTrain from "@/components/PhotoTrain";
 import GiftBurst from "@/components/GiftBurst";
-import WaveTransition from "@/components/WaveTransition"; // New import
+import WaveTransition from "@/components/WaveTransition";
 import GunAnimation from "@/components/GunAnimation";
 import BulletHole from "@/components/BulletHole";
 
@@ -20,15 +20,15 @@ const Surprise = () => {
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [showShootButton, setShowShootButton] = useState(false);
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
-  const [burstOrigin, setBurstOrigin] = useState<{ x: number; y: number } | null>(null); 
+  const [burstOrigin, setBurstOrigin] = useState<{ x: number; y: number } | null>(null);
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
   const revealButtonRef = useRef<HTMLButtonElement>(null);
   const shootButtonRef = useRef<HTMLButtonElement>(null);
-  const giftBoxRef = useRef<HTMLDivElement>(null); 
-  const mainContentRef = useRef<HTMLDivElement>(null); 
+  const giftBoxRef = useRef<HTMLDivElement>(null);
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
 
@@ -62,20 +62,20 @@ const Surprise = () => {
   }, [animationPhase, showShootButton]);
 
   const handleGiftOpen = useCallback((position: { x: number; y: number }) => {
-    setBurstOrigin(position); 
-    setAnimationPhase("burstingAndWaveTransition"); 
+    setBurstOrigin(position);
+    setAnimationPhase("burstingAndWaveTransition");
   }, []);
 
   const handlePhotoTrainComplete = useCallback(() => {
     setAnimationPhase("finalMessage");
-    setBulletHolePosition(null); 
+    setBulletHolePosition(null);
   }, []);
 
   const handleReplay = useCallback(() => {
     setAnimationPhase('gift');
     setShowShootButton(false);
-    setBulletHolePosition(null); 
-    setBurstOrigin(null); 
+    setBulletHolePosition(null);
+    setBurstOrigin(null);
     if (mainContentRef.current) {
         gsap.set(mainContentRef.current, { opacity: 1, display: 'flex' });
     }
@@ -88,12 +88,12 @@ const Surprise = () => {
 
     if (message && revealButton && replayButton) {
       const gradientClasses = ['bg-clip-text', 'text-transparent', 'bg-gradient-to-r', 'from-pink-400', 'via-purple-400', 'to-cyan-400'];
-      
+
       const tl = gsap.timeline();
       tl.to(revealButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in' })
-        .to(message, { 
-          filter: 'blur(0px)', 
-          duration: 1.5, 
+        .to(message, {
+          filter: 'blur(0px)',
+          duration: 1.5,
           ease: 'power2.out',
           onStart: () => {
             message.classList.remove(...gradientClasses);
@@ -101,11 +101,11 @@ const Surprise = () => {
             message.style.textShadow = '0 0 15px rgba(0, 255, 255, 0.7)';
           }
         }, 0)
-        .to(message, { 
-          filter: 'blur(16px)', 
-          duration: 1.5, 
-          ease: 'power2.inOut', 
-          delay: 2.5,
+        .to(message, {
+          filter: 'blur(16px)',
+          duration: 1.5,
+          ease: 'power2.inOut',
+          delay: 9.5, // Adjusted delay to make the text revealed for 8 seconds (1.5s unblur + 8s revealed = 9.5s total before re-blur starts)
           onStart: () => {
             message.classList.add(...gradientClasses);
             message.classList.remove('text-cyan-300');
@@ -173,7 +173,6 @@ const Surprise = () => {
         </>
       )}
 
-      {/* Other animations are rendered based on their respective phases */}
       {animationPhase === 'preShootButton' && showShootButton && (
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <h2 className="text-3xl md:text-5xl font-bold mb-8 animate-fade-in-down">Ready for more magic?</h2>
@@ -202,8 +201,8 @@ const Surprise = () => {
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div ref={finalGiftRef} className="text-8xl">🎁</div>
           {finalGiftRef.current && gsap.getProperty(finalGiftRef.current, "opacity") === 0 && <Confetti />}
-          <div 
-            ref={messageRef} 
+          <div
+            ref={messageRef}
             className="font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400"
             style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
           >
