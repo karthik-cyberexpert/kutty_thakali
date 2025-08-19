@@ -10,7 +10,6 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
   const girlRef = useRef<HTMLDivElement>(null);
   const percentageRef = useRef<HTMLSpanElement>(null);
   const barContainerRef = useRef<HTMLDivElement>(null);
-  // Removed `progress` state as it's no longer directly controlling the bar's width via React style
 
   useEffect(() => {
     const bar = barRef.current;
@@ -23,8 +22,7 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
       return;
     }
 
-    gsap.set(bar, { width: '0%' });
-    gsap.set(girl, { left: '0%', transform: 'translateX(-50%)' });
+    // Ensure initial text content is 0%
     gsap.set(percentageText, { textContent: '0%' });
 
     const duration = 8; // Set animation duration to 8 seconds
@@ -36,7 +34,6 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
         const currentProgress = Math.round((currentBarWidth / containerWidth) * 100);
         
         if (!isNaN(currentProgress)) {
-          // Only update the text content, let GSAP handle the bar's width directly
           if (percentageText) {
             percentageText.textContent = `${currentProgress}%`;
           }
@@ -45,21 +42,22 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
       onComplete: onComplete,
     });
 
-    tl.to(bar, { width: '100%', duration: duration, ease: 'power2.inOut' }, 0)
-      .to(girl, { left: '100%', duration: duration, ease: 'power2.inOut' }, 0);
+    // Animate bar width from 0% to 100%
+    tl.fromTo(bar, { width: '0%' }, { width: '100%', duration: duration, ease: 'power2.inOut' }, 0)
+      // Animate girl's position from 0% to 100%
+      .fromTo(girl, { left: '0%', transform: 'translateX(-50%)' }, { left: '100%', duration: duration, ease: 'power2.inOut' }, 0);
   }, [onComplete]);
 
   return (
     <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-sm">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-row items-center gap-4"> {/* Explicitly flex-row for horizontal layout */}
         <div
           ref={barContainerRef}
-          className="w-3/4 max-w-md bg-gray-700 rounded-lg h-8 relative overflow-hidden"
+          className="w-3/4 max-w-md bg-gray-700 rounded-lg h-8 relative overflow-hidden min-w-[200px]" // Added min-w for guaranteed visibility
         >
           <div
             ref={barRef}
             className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
-            // Removed style={{ width: `${progress}%` }} to let GSAP control it directly
           ></div>
           <div
             ref={girlRef}
