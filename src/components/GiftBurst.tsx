@@ -10,7 +10,10 @@ interface GiftBurstProps {
 const GiftBurst = ({ originX, originY, onComplete }: GiftBurstProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const numParticles = 200;
-  const particles = ['💖', '✨', '🎉', '🎂', '🎈', '⭐', '🎁', '🍰', '🎊', '❤️', '🥳'];
+  const particles = [
+    '💖', '✨', '🎉', '🎂', '🎈', '⭐', '🎁', '🍰', '🎊', '❤️', '🥳', // Existing
+    '🍫', '🍪', '🍟', '🍕', '🍔', '📱', '🍬', '🍩', '🍦', '🥨', '🍿' // New items
+  ];
 
   useEffect(() => {
     const container = containerRef.current;
