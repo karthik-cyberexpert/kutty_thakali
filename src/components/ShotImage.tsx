@@ -55,13 +55,22 @@ const ShotImage: React.FC<ShotImageProps> = ({ src, holePosition, index }) => {
 
   }, [src, holePosition, index]);
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error(`Failed to load image: ${src}`, e);
+    // If image fails to load, set a distinct background color to indicate a problem
+    if (e.currentTarget) {
+      e.currentTarget.style.backgroundColor = 'red'; // Make it clearly visible if image fails
+    }
+  };
+
   return (
     <img
       ref={imageRef}
       src={src}
       alt={`Surprise image ${index + 1}`}
-      className="absolute w-48 h-48 object-cover rounded-2xl border-4 border-pink-400 shadow-lg"
+      className="absolute w-48 h-48 object-cover rounded-2xl border-4 border-pink-400 shadow-lg bg-white" // Added bg-white here
       style={{ boxShadow: '0 0 15px #ff00ff, 0 0 25px #ff00ff' }}
+      onError={handleImageError}
     />
   );
 };

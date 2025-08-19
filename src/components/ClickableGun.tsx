@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
-import { Target } from 'lucide-react';
+// Removed import for Target icon
 
 interface ClickableGunProps {
   onGunClick: () => void;
@@ -41,7 +41,7 @@ const ClickableGun: React.FC<ClickableGunProps> = ({ onGunClick, holePosition })
     // Bullet animation
     const gunRect = gun.getBoundingClientRect();
     gsap.set(bullet, {
-      x: gunRect.right - 20,
+      x: gunRect.right - 20, // Position bullet near the gun's barrel
       y: gunRect.top + gunRect.height / 2,
       opacity: 1,
       scale: 0.5,
@@ -61,8 +61,29 @@ const ClickableGun: React.FC<ClickableGunProps> = ({ onGunClick, holePosition })
 
   return (
     <div className="absolute inset-0 pointer-events-none z-40 flex items-center justify-start">
-      <div ref={gunRef} onClick={handleClick} className="relative text-7xl text-white cursor-pointer pointer-events-auto">
-        <Target size={80} />
+      <div ref={gunRef} onClick={handleClick} className="relative text-white cursor-pointer pointer-events-auto">
+        {/* Pistol SVG */}
+        <svg
+          width="120"
+          height="80"
+          viewBox="0 0 120 80"
+          fill="currentColor"
+          className="drop-shadow-lg"
+          style={{ filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))' }}
+        >
+          {/* Barrel */}
+          <rect x="0" y="25" width="80" height="15" rx="5" ry="5" />
+          {/* Body */}
+          <path d="M60 25 L100 25 L110 40 L60 40 Z" />
+          {/* Handle */}
+          <path d="M60 40 L65 75 L90 75 L85 40 Z" />
+          {/* Trigger guard */}
+          <path d="M60 40 Q55 45 60 50 L65 50 L60 40 Z" />
+          {/* Trigger */}
+          <rect x="60" y="45" width="5" height="10" rx="2" ry="2" />
+          {/* Sight */}
+          <rect x="70" y="20" width="5" height="5" rx="2" ry="2" />
+        </svg>
         <div
           ref={bulletRef}
           className="absolute w-4 h-4 rounded-full bg-white shadow-lg"
