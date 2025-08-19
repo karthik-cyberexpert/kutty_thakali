@@ -1,21 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ParticlesBackground from "@/components/ParticlesBackground";
 import { Gift } from "lucide-react";
+import LoadingBarAnimation from "@/components/LoadingBarAnimation"; // Import the new component
 
 const Welcome = () => {
-  const [name, setName] = useState(""); // Initialize with empty string
-  const [error, setError] = useState<string | null>(null); // State for error message
+  const [name, setName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [showLoading, setShowLoading] = useState(false); // New state for loading animation
   const navigate = useNavigate();
+
+  const handleAnimationComplete = useCallback(() => {
+    navigate(`/surprise/${name.trim()}`);
+  }, [name, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim().toLowerCase() === "kutty thakali") { // Case-insensitive check
-      navigate(`/surprise/${name.trim()}`);
+    if (name.trim().toLowerCase() === "kutty thakali") {
+      setShowLoading(true); // Show loading animation
     } else {
       setError("Enter: Kutty Thakali");
     }
@@ -47,12 +53,14 @@ const Welcome = () => {
             <Button
               type="submit"
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 mt-2"
+              disabled={showLoading} // Disable button while loading
             >
               Let's Go <Gift className="ml-2" />
             </Button>
           </form>
         </div>
       </div>
+      {showLoading && <LoadingBarAnimation onComplete={handleAnimationComplete} />}
     </div>
   );
 };
