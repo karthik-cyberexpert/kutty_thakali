@@ -15,9 +15,9 @@ const ClickableGun: React.FC<ClickableGunProps> = ({ onGunClick, holePosition })
     const gun = gunRef.current;
     if (!gun) return;
 
-    // Initial position for the gun (center-left, off-screen)
-    gsap.set(gun, { x: -100, y: window.innerHeight * 0.5 - 40, opacity: 0 }); // Centered vertically
-    gsap.to(gun, { x: 50, opacity: 1, duration: 0.8, ease: 'power2.out' }); // Gun slides in
+    // Initial position for the gun (off-screen left)
+    gsap.set(gun, { xPercent: -150, opacity: 0 }); // Start far left, off-screen, relative to its own width
+    gsap.to(gun, { xPercent: 0, opacity: 1, duration: 0.8, ease: 'power2.out' }); // End at its natural centered position
   }, []);
 
   const handleClick = () => {
@@ -60,7 +60,7 @@ const ClickableGun: React.FC<ClickableGunProps> = ({ onGunClick, holePosition })
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-40 flex items-center justify-start">
+    <div className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center"> {/* Changed justify-start to justify-center */}
       <div ref={gunRef} onClick={handleClick} className="relative text-white cursor-pointer pointer-events-auto">
         {/* Pistol SVG */}
         <svg
