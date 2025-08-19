@@ -26,7 +26,7 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
       scale: 0,
       opacity: 0,
       rotation: gsap.utils.random(0, 360),
-      fontSize: `${gsap.utils.random(20, 50)}px`, // Randomize size like other particles
+      // Removed random font size to set a fixed, larger size
     });
 
     const scatterDuration = 1.2;
@@ -79,10 +79,10 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     <div
       ref={mailRef}
       onClick={handleClick}
-      className="absolute z-50 flex flex-col items-center justify-center cursor-pointer text-white"
-      // Removed filter: drop-shadow to blend more with other emojis
+      className="absolute z-50 flex flex-col items-center justify-center cursor-pointer text-white text-9xl" // Increased size to text-9xl
+      style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(0,255,255,0.8)' }} // Added strong glowing shadow
     >
-      ✉️ {/* Changed to mail emoji */}
+      ✉️
     </div>
   );
 };
