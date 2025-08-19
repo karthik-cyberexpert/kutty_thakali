@@ -48,7 +48,7 @@ const Welcome = () => {
               type="submit"
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 mt-2"
             >
-              Create Surprise <Gift className="ml-2" />
+              Let's Go <Gift className="ml-2" />
             </Button>
           </form>
         </div>
