@@ -67,21 +67,9 @@ const Surprise = () => {
   }, []);
 
   const handleBurstComplete = useCallback(() => {
-    const mainContentElement = mainContentRef.current; 
-
-    if (mainContentElement) {
-        gsap.to(mainContentElement, {
-            opacity: 0,
-            duration: 0.8,
-            ease: 'power2.in',
-            onComplete: () => {
-                mainContentElement.style.display = 'none'; // Hide after fade
-                setAnimationPhase("boyAnimation"); 
-            }
-        });
-    } else {
-        setAnimationPhase("boyAnimation"); 
-    }
+    // No longer fading out mainContentRef here.
+    // It will fade out when the paper covers the screen.
+    setAnimationPhase("boyAnimation"); 
   }, []);
 
   const handlePhotoTrainComplete = useCallback(() => {
@@ -140,7 +128,17 @@ const Surprise = () => {
   }, []);
 
   const handleBoyAndPaperAnimationPaperCover = useCallback(() => {
-    // This callback no longer changes phase, the button will trigger photoTrain
+    // This callback is now responsible for fading out the initial content
+    if (mainContentRef.current) {
+        gsap.to(mainContentRef.current, {
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power2.in',
+            onComplete: () => {
+                mainContentRef.current!.style.display = 'none'; // Hide after fade
+            }
+        });
+    }
   }, []);
 
   const handleShoot = useCallback(() => {
@@ -159,7 +157,7 @@ const Surprise = () => {
       <AudioPlayer src="/birthday-music.mp3" />
 
       {/* Main content div that holds the gift box and initial message */}
-      {animationPhase === 'gift' || animationPhase === 'bursting' && (
+      {(animationPhase === 'gift' || animationPhase === 'bursting' || animationPhase === 'boyAnimation') && (
         <div ref={mainContentRef} className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div className="flex flex-col items-center animate-fade-in-down">
             <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
