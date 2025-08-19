@@ -62,8 +62,16 @@ const PhotoTrain: React.FC<PhotoTrainProps> = ({ images, onComplete, holePositio
       },
     });
 
-    // Hold the images on screen for a few seconds
-    tl.to({}, { duration: 5 }); // Empty tween to add a delay
+    // Add subtle floating animation for the duration they are on screen
+    tl.to(imageElements, {
+      y: '+=10', // Move up by 10px
+      scale: 1.02, // Slightly larger
+      rotation: '+=2', // Slight rotation
+      duration: 2, // Duration of one float cycle
+      ease: 'sine.inOut',
+      yoyo: true, // Go back and forth
+      repeat: 2, // Repeat twice for a total of 4 seconds of floating
+    }, "-=0.5"); // Start this slightly before the scatter animation ends for a smoother transition
 
   }, [images, onComplete, holePosition]);
 
