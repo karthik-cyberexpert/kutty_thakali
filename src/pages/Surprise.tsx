@@ -23,13 +23,14 @@ const Surprise = () => {
   const [bombPosition, setBombPosition] = useState<{ x: number; y: number } | null>(null);
   const [explosionOrigin, setExplosionOrigin] = useState<{ x: number; y: number } | null>(null);
   const [isGiftBurstFading, setIsGiftBurstFading] = useState(false);
-  const [showMailText, setShowMailText] = useState(false);
+  const [showFindMailText, setShowFindMailText] = useState(false); // New state for "Find a mail box" text
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
   const revealButtonRef = useRef<HTMLButtonElement>(null);
   const mainContentRef = useRef<HTMLDivElement>(null);
+  const findMailTextRef = useRef<HTMLDivElement>(null); // Ref for the new text
 
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
 
@@ -41,7 +42,7 @@ const Surprise = () => {
       setBombPosition(null);
       setExplosionOrigin(null);
       setIsGiftBurstFading(false);
-      setShowMailText(false);
+      setShowFindMailText(false); // Ensure this is false
     }
   }, [location.state]);
 
@@ -79,25 +80,35 @@ const Surprise = () => {
 
   const handleTimerComplete = useCallback(() => {
     setAnimationPhase("explosion"); // Transition to explosion phase where particles and mail appear
+    setShowFindMailText(true); // Show "Find a mail box" text
   }, []);
 
   const handleMailClick = useCallback(() => {
     // This is called when the Mail icon is clicked
     setIsGiftBurstFading(true); // Trigger GiftBurst particles to fade out
-    setShowMailText(true); // Trigger "Open Mail!" text animation
+    setShowFindMailText(false); // Hide "Find a mail box" text
+    // The Mail component's own animation will handle its disappearance
   }, []);
 
   const handleMailOpenComplete = useCallback(() => {
     // This is called after the Mail opening animation finishes
-    navigate(`/mail-content/${name}`); // Navigate to the new page
+    // We now wait for GiftBurst to fade out before navigating
+    // The navigation is handled by handleGiftBurstFadeOutComplete
+  }, []);
+
+  const handleGiftBurstFadeOutComplete = useCallback(() => {
+    // This callback is fired when GiftBurst particles have completely faded out
+    navigate(`/mail-content/${name}`); // Now navigate to the new page
+    setIsGiftBurstFading(false); // Reset state for replay
+    setShowFindMailText(false); // Ensure this is false
   }, [name, navigate]);
 
   const handleReplay = useCallback(() => {
     setAnimationPhase('gift');
     setBombPosition(null);
     setExplosionOrigin(null);
-    setIsGiftBurstFading(false);
-    setShowMailText(false);
+    setIsGiftBurstFading(false); // Reset state
+    setShowFindMailText(false); // Reset state
     if (mainContentRef.current) {
         gsap.set(mainContentRef.current, { opacity: 1, display: 'flex' });
     }
@@ -170,13 +181,22 @@ const Surprise = () => {
             originX={explosionOrigin.x}
             originY={explosionOrigin.y}
             fadeAway={isGiftBurstFading} // Control fade out via state
+            onFadeOutComplete={handleGiftBurstFadeOutComplete} // Callback when fade out is done
           />
           <Mail
             explosionOrigin={explosionOrigin} // Pass origin for scattering
             onMailClick={handleMailClick}
-            showText={showMailText}
             onMailOpenComplete={handleMailOpenComplete}
           />
+          {showFindMailText && (
+            <div
+              ref={findMailTextRef}
+              className="absolute inset-0 flex items-center justify-center z-40 text-white text-4xl md:text-5xl font-bold animate-fade-in-down"
+              style={{ textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(0,255,255,0.7)' }}
+            >
+              Find a mail box!
+            </div>
+          )}
         </>
       )}
 

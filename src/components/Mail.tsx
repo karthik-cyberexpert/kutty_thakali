@@ -1,17 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { Mail as MailIcon } from 'lucide-react';
 
 interface MailProps {
   explosionOrigin: { x: number; y: number }; // Where the explosion happened
   onMailClick: () => void; // Callback when mail icon is clicked
-  showText: boolean; // Controls "Open Mail!" text visibility
   onMailOpenComplete: () => void; // Callback for when mail opening animation finishes
 }
 
-const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, showText, onMailOpenComplete }) => {
+const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenComplete }) => {
   const mailRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const mail = mailRef.current;
@@ -29,6 +26,7 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, showText, onM
       scale: 0,
       opacity: 0,
       rotation: gsap.utils.random(0, 360),
+      fontSize: `${gsap.utils.random(20, 50)}px`, // Randomize size like other particles
     });
 
     const scatterDuration = 1.2;
@@ -58,25 +56,11 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, showText, onM
 
   }, [explosionOrigin]);
 
-  useEffect(() => {
-    const textElement = textRef.current;
-    if (!textElement) return;
-
-    if (showText) {
-      gsap.fromTo(textElement,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', delay: 0.2 }
-      );
-    } else {
-      gsap.set(textElement, { opacity: 0, y: 20 }); // Keep hidden initially
-    }
-  }, [showText]);
-
   const handleClick = () => {
     const mail = mailRef.current;
     if (!mail) return;
 
-    onMailClick(); // Notify parent to start fading burst and show text
+    onMailClick(); // Notify parent to start fading burst and hide "Find a mail box" text
 
     // Mail opening animation
     gsap.timeline({
@@ -88,12 +72,6 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, showText, onM
       opacity: 0,
       duration: 1,
       ease: 'power2.inOut',
-      onStart: () => {
-        // Hide the "Open Mail!" text immediately when mail is clicked
-        if (textRef.current) {
-          gsap.to(textRef.current, { opacity: 0, y: -20, duration: 0.3 });
-        }
-      }
     });
   };
 
@@ -102,12 +80,9 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, showText, onM
       ref={mailRef}
       onClick={handleClick}
       className="absolute z-50 flex flex-col items-center justify-center cursor-pointer text-white"
-      style={{ filter: 'drop-shadow(0 0 15px rgba(0, 255, 255, 0.7))' }}
+      // Removed filter: drop-shadow to blend more with other emojis
     >
-      <MailIcon size={120} className="text-cyan-400" />
-      <div ref={textRef} className="text-3xl font-bold mt-4 animate-pulse">
-        Open Mail!
-      </div>
+      ✉️ {/* Changed to mail emoji */}
     </div>
   );
 };
