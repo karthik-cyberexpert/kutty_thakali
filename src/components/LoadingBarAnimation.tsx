@@ -19,14 +19,18 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
     if (!bar || !girl || !percentageText) return;
 
     gsap.set(bar, { width: '0%' });
-    gsap.set(girl, { x: '-100%' }); // Start girl off-screen to the left of the bar
+    // Start girl at 0% left, centered by translateX(-50%)
+    gsap.set(girl, { left: '0%', transform: 'translateX(-50%)' });
     gsap.set(percentageText, { textContent: '0%' });
 
     const duration = 3.5; // 3.5 seconds for the animation
 
     const tl = gsap.timeline({
       onUpdate: () => {
-        const currentProgress = Math.round(gsap.getProperty(bar, 'width', 'px') / bar.parentElement!.offsetWidth * 100);
+        // Calculate progress based on the bar's width relative to its parent
+        const parentWidth = bar.parentElement?.offsetWidth || 1;
+        const currentBarWidth = gsap.getProperty(bar, 'width', 'px') as number;
+        const currentProgress = Math.round((currentBarWidth / parentWidth) * 100);
         setProgress(currentProgress);
         if (percentageText) {
           percentageText.textContent = `${currentProgress}%`;
@@ -36,7 +40,8 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
     });
 
     tl.to(bar, { width: '100%', duration: duration, ease: 'power2.inOut' }, 0)
-      .to(girl, { x: '100%', duration: duration, ease: 'power2.inOut' }, 0); // Animate girl across the bar
+      // Animate the girl's 'left' property from 0% to 100% of the parent container
+      .to(girl, { left: '100%', duration: duration, ease: 'power2.inOut' }, 0);
   }, [onComplete]);
 
   return (
@@ -50,7 +55,8 @@ const LoadingBarAnimation: React.FC<LoadingBarAnimationProps> = ({ onComplete })
         <div
           ref={girlRef}
           className="absolute top-1/2 -translate-y-1/2 text-3xl"
-          style={{ left: '0%', transform: 'translateX(-50%)' }} // Adjust initial position
+          // Initial left is 0%, translateX(-50%) centers the girl at that point
+          style={{ transform: 'translateX(-50%)' }}
         >
           🏃‍♀️
         </div>
