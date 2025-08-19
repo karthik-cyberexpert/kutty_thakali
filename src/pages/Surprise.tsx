@@ -22,12 +22,14 @@ const Surprise = () => {
   const [hasPlayedIntroAnimation, setHasPlayedIntroAnimation] = useState(false);
   const [showShootButton, setShowShootButton] = useState(false);
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
+  const [burstOrigin, setBurstOrigin] = useState<{ x: number; y: number } | null>(null); // State to store burst origin
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
   const revealButtonRef = useRef<HTMLButtonElement>(null);
   const shootButtonRef = useRef<HTMLButtonElement>(null);
+  const giftBoxRef = useRef<HTMLDivElement>(null); // Ref for the GiftBox component
 
   const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
 
@@ -60,7 +62,8 @@ const Surprise = () => {
     }
   }, [animationPhase, showShootButton]);
 
-  const handleGiftOpen = useCallback(() => {
+  const handleGiftOpen = useCallback((position: { x: number; y: number }) => {
+    setBurstOrigin(position); // Set the origin for the burst
     setIsTransitioning(true);
   }, []);
 
@@ -74,6 +77,7 @@ const Surprise = () => {
     setAnimationPhase('gift');
     setShowShootButton(false);
     setBulletHolePosition(null); // Ensure hole is hidden on replay
+    setBurstOrigin(null); // Reset burst origin on replay
   }, []);
 
   const handleReveal = useCallback(() => {
@@ -141,7 +145,7 @@ const Surprise = () => {
         {animationPhase === 'gift' && !isTransitioning && (
           <div className="flex flex-col items-center animate-fade-in-down">
             <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
-            <GiftBox onOpen={handleGiftOpen} />
+            <GiftBox ref={giftBoxRef} onOpen={handleGiftOpen} />
           </div>
         )}
 
@@ -193,9 +197,9 @@ const Surprise = () => {
         </>
       )}
 
-      {isTransitioning && !hasPlayedIntroAnimation && (
+      {isTransitioning && !hasPlayedIntroAnimation && burstOrigin && (
         <div className="absolute inset-0 z-20">
-          <GiftBurst />
+          <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} />
           <BoyAndPaperAnimation
             onPaperCover={handleBoyAndPaperAnimationPaperCover}
             onComplete={handleBoyAndPaperAnimationComplete}

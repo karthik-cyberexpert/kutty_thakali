@@ -1,7 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
-const GiftBurst = () => {
+interface GiftBurstProps {
+  originX: number;
+  originY: number;
+}
+
+const GiftBurst = ({ originX, originY }: GiftBurstProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const numParticles = 200;
   const particles = ['💖', '✨', '🎉', '🎂', '🎈', '⭐', '🎁', '🍰', '🎊', '❤️', '🥳'];
@@ -16,13 +21,17 @@ const GiftBurst = () => {
       particle.style.fontSize = `${gsap.utils.random(20, 50)}px`;
       particle.innerText = gsap.utils.random(particles);
       particle.style.opacity = '0';
+      // Set initial position to the origin
+      particle.style.left = `${originX}px`;
+      particle.style.top = `${originY}px`;
+      particle.style.transform = 'translate(-50%, -50%)'; // Center the particle on the origin
       container.appendChild(particle);
       return particle;
     });
 
     gsap.to(particleElements, {
-      x: () => gsap.utils.random(-window.innerWidth / 2, window.innerWidth / 2),
-      y: () => gsap.utils.random(-window.innerHeight / 2, window.innerHeight / 2),
+      x: () => gsap.utils.random(-window.innerWidth / 2, window.innerWidth / 2), // Relative to origin
+      y: () => gsap.utils.random(-window.innerHeight / 2, window.innerHeight / 2), // Relative to origin
       rotation: () => gsap.utils.random(0, 720),
       opacity: 1,
       duration: 1.2,
@@ -39,9 +48,9 @@ const GiftBurst = () => {
         particleElements.forEach(p => p.remove());
       }
     });
-  }, []);
+  }, [originX, originY]);
 
-  return <div ref={containerRef} className="absolute inset-0 flex items-center justify-center z-30" />;
+  return <div ref={containerRef} className="absolute inset-0 z-30 pointer-events-none" />;
 };
 
 export default GiftBurst;
