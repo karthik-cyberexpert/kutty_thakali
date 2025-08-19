@@ -12,22 +12,23 @@ import GiftBurst from "@/components/GiftBurst";
 import WaveTransition from "@/components/WaveTransition";
 import GunAnimation from "@/components/GunAnimation";
 import BulletHole from "@/components/BulletHole";
+import Bomb from "@/components/Bomb"; // New import
+import CountdownTimer from "@/components/CountdownTimer"; // New import
+import Mail from "@/components/Mail"; // New import
 
-type AnimationPhase = "gift" | "burstingAndWaveTransition" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "bombThrown" | "timerCountdown" | "explosion" | "mailRevealed" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
-  const [showShootButton, setShowShootButton] = useState(false);
+  const [bombPosition, setBombPosition] = useState<{ x: number; y: number } | null>(null);
+  const [explosionOrigin, setExplosionOrigin] = useState<{ x: number; y: number } | null>(null);
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
-  const [burstOrigin, setBurstOrigin] = useState<{ x: number; y: number } | null>(null);
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const replayButtonRef = useRef<HTMLButtonElement>(null);
   const revealButtonRef = useRef<HTMLButtonElement>(null);
-  const shootButtonRef = useRef<HTMLButtonElement>(null);
-  const giftBoxRef = useRef<HTMLDivElement>(null);
   const mainContentRef = useRef<HTMLDivElement>(null);
 
   const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
@@ -53,17 +54,32 @@ const Surprise = () => {
         .to(gift, { scale: 1.5, opacity: 0, duration: 0.5, ease: 'power2.in' })
         .fromTo(letters, { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.05, duration: 0.5, ease: 'power2.out' }, "-=0.2")
         .to(revealButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' }, "+=0.5");
-    } else if (animationPhase === "preShootButton" && showShootButton) {
-        gsap.fromTo(shootButtonRef.current,
-            { opacity: 0, y: 50 },
-            { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.5 }
-        );
     }
-  }, [animationPhase, showShootButton]);
+  }, [animationPhase]);
 
   const handleGiftOpen = useCallback((position: { x: number; y: number }) => {
-    setBurstOrigin(position);
-    setAnimationPhase("burstingAndWaveTransition");
+    setBombPosition(position);
+    setAnimationPhase("bombThrown");
+  }, []);
+
+  const handleBombClick = useCallback((position: { x: number; y: number }) => {
+    setExplosionOrigin(position); // Set explosion origin to bomb's position
+    setAnimationPhase("timerCountdown");
+  }, []);
+
+  const handleTimerComplete = useCallback(() => {
+    setAnimationPhase("explosion");
+  }, []);
+
+  const handleExplosionComplete = useCallback(() => {
+    setAnimationPhase("mailRevealed");
+  }, []);
+
+  const handleMailClick = useCallback(() => {
+    // Transition to the next phase after mail is clicked
+    // For now, let's transition to the PhotoTrain phase directly
+    // If you want to re-introduce the "Shoot!" button, we'd add a new phase here.
+    setAnimationPhase("photoTrain");
   }, []);
 
   const handlePhotoTrainComplete = useCallback(() => {
@@ -73,9 +89,9 @@ const Surprise = () => {
 
   const handleReplay = useCallback(() => {
     setAnimationPhase('gift');
-    setShowShootButton(false);
+    setBombPosition(null);
+    setExplosionOrigin(null);
     setBulletHolePosition(null);
-    setBurstOrigin(null);
     if (mainContentRef.current) {
         gsap.set(mainContentRef.current, { opacity: 1, display: 'flex' });
     }
@@ -105,7 +121,7 @@ const Surprise = () => {
           filter: 'blur(16px)',
           duration: 1.5,
           ease: 'power2.inOut',
-          delay: 9.5, // Adjusted delay to make the text revealed for 8 seconds (1.5s unblur + 8s revealed = 9.5s total before re-blur starts)
+          delay: 9.5,
           onStart: () => {
             message.classList.add(...gradientClasses);
             message.classList.remove('text-cyan-300');
@@ -116,87 +132,62 @@ const Surprise = () => {
     }
   }, []);
 
-  const handleWaveTransitionComplete = useCallback(() => {
-    setAnimationPhase("preShootButton");
-    setShowShootButton(true);
-  }, []);
-
-  const handleWaveTransitionCover = useCallback(() => {
-    // This callback is now responsible for fading out the initial content
-    if (mainContentRef.current) {
-        gsap.to(mainContentRef.current, {
-            opacity: 0,
-            duration: 0.8,
-            ease: 'power2.in',
-            onComplete: () => {
-                mainContentRef.current!.style.display = 'none'; // Hide after fade
-            }
-        });
-    }
-  }, []);
-
-  const handleShoot = useCallback(() => {
-    setShowShootButton(false);
-    setAnimationPhase("shooting");
-  }, []);
-
+  // Placeholder for GunAnimation and BulletHole if they are still desired later
+  // For now, PhotoTrain will follow Mail.
   const handleGunShotComplete = useCallback((holePos: { x: number; y: number }) => {
     setBulletHolePosition(holePos);
     setAnimationPhase("photoTrain");
   }, []);
+
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       <ParticlesBackground />
       <AudioPlayer src="/birthday-music.mp3" />
 
-      {/* Main content div that holds the gift box and initial message */}
-      {(animationPhase === 'gift' || animationPhase === 'burstingAndWaveTransition') && (
+      {/* Phase: Gift Box */}
+      {animationPhase === 'gift' && (
         <div ref={mainContentRef} className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div className="flex flex-col items-center animate-fade-in-down">
             <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
-            <GiftBox ref={giftBoxRef} onOpen={handleGiftOpen} />
+            <GiftBox onOpen={handleGiftOpen} />
           </div>
         </div>
       )}
 
-      {/* GiftBurst and WaveTransition render during the combined phase */}
-      {animationPhase === 'burstingAndWaveTransition' && (
+      {/* Phase: Bomb Thrown */}
+      {animationPhase === 'bombThrown' && bombPosition && (
+        <Bomb initialX={bombPosition.x} initialY={bombPosition.y} onBombClick={handleBombClick} />
+      )}
+
+      {/* Phase: Timer Countdown */}
+      {animationPhase === 'timerCountdown' && (
+        <CountdownTimer onComplete={handleTimerComplete} />
+      )}
+
+      {/* Phase: Explosion */}
+      {animationPhase === 'explosion' && explosionOrigin && (
+        <GiftBurst originX={explosionOrigin.x} originY={explosionOrigin.y} onComplete={handleExplosionComplete} />
+      )}
+
+      {/* Phase: Mail Revealed */}
+      {animationPhase === 'mailRevealed' && (
+        <Mail onMailClick={handleMailClick} />
+      )}
+
+      {/* Phase: Photo Train (after mail click) */}
+      {animationPhase === 'photoTrain' && (
+        // Re-using GunAnimation and BulletHole to trigger PhotoTrain as per previous flow
+        // If you want to remove the gun animation, we can directly call PhotoTrain here
+        // For now, I'll keep the gun animation as a transition to PhotoTrain
         <>
-          {burstOrigin && (
-            <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} />
-          )}
-          <WaveTransition
-            onCover={handleWaveTransitionCover}
-            onComplete={handleWaveTransitionComplete}
-          />
+            {!bulletHolePosition && <GunAnimation onShotComplete={handleGunShotComplete} />}
+            {bulletHolePosition && <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />}
+            {bulletHolePosition && <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />}
         </>
       )}
 
-      {animationPhase === 'preShootButton' && showShootButton && (
-        <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
-          <h2 className="text-3xl md:text-5xl font-bold mb-8 animate-fade-in-down">Ready for more magic?</h2>
-          <Button
-            ref={shootButtonRef}
-            onClick={handleShoot}
-            className="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-bold py-6 px-10 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 opacity-0"
-          >
-            Shoot! 🔫
-          </Button>
-        </div>
-      )}
-
-      {animationPhase === 'shooting' && (
-        <GunAnimation onShotComplete={handleGunShotComplete} />
-      )}
-
-      {animationPhase === 'photoTrain' && bulletHolePosition && (
-        <>
-          <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />
-          <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />
-        </>
-      )}
-
+      {/* Phase: Final Message */}
       {animationPhase === "finalMessage" && (
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div ref={finalGiftRef} className="text-8xl">🎁</div>

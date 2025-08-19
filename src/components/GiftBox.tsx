@@ -9,23 +9,21 @@ interface GiftBoxProps {
 
 const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className }, ref) => {
   const giftBoxRef = useRef<HTMLDivElement>(null);
-  const borderTopRef = useRef<HTMLDivElement>(null);
-  const borderBottomRef = useRef<HTMLDivElement>(null);
-  const borderLeftRef = useRef<HTMLDivElement>(null);
-  const borderRightRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
+  const lidRef = useRef<HTMLDivElement>(null);
+  const ribbonVerticalRef = useRef<HTMLDivElement>(null);
+  const ribbonHorizontalRef = useRef<HTMLDivElement>(null);
+  const bowRef = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref, () => giftBoxRef.current!);
 
   const handleClick = () => {
     const gift = giftBoxRef.current;
-    const borderTop = borderTopRef.current;
-    const borderBottom = borderBottomRef.current;
-    const borderLeft = borderLeftRef.current;
-    const borderRight = borderRightRef.current;
-    const glow = glowRef.current;
+    const lid = lidRef.current;
+    const ribbonVertical = ribbonVerticalRef.current;
+    const ribbonHorizontal = ribbonHorizontalRef.current;
+    const bow = bowRef.current;
 
-    if (!gift || !borderTop || !borderBottom || !borderLeft || !borderRight || !glow) return;
+    if (!gift || !lid || !ribbonVertical || !ribbonHorizontal || !bow) return;
 
     // Disable further clicks
     gift.style.pointerEvents = 'none';
@@ -36,41 +34,38 @@ const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className },
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // Fade out the box elements to make way for the burst
-        gsap.to([borderTop, borderBottom, borderLeft, borderRight, gift], {
+        // After the bomb is "thrown", hide the gift box
+        gsap.to(gift, {
           opacity: 0,
           duration: 0.3,
           ease: 'power1.in',
           onComplete: () => {
-            // Hide elements completely after fading
-            if (borderTop) borderTop.style.display = 'none';
-            if (borderBottom) borderBottom.style.display = 'none';
-            if (borderLeft) borderLeft.style.display = 'none';
-            if (borderRight) borderRight.style.display = 'none';
-            if (gift) gift.style.display = 'none';
+            gift.style.display = 'none';
           }
         });
-        onOpen({ x: centerX, y: centerY }); // Call onOpen after animation
+        onOpen({ x: centerX, y: centerY }); // Call onOpen to signal bomb animation
       }
     });
 
-    // Animate the borders expanding outwards and fading
-    tl.to(borderTop, { y: '-100%', opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
-      .to(borderBottom, { y: '100%', opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
-      .to(borderLeft, { x: '-100%', opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
-      .to(borderRight, { x: '100%', opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
-      // Animate the internal glow
-      .fromTo(glow,
-        { scale: 0, opacity: 0 },
-        { scale: 1.5, opacity: 1, duration: 0.5, ease: 'power2.out' },
-        0.2 // Start glow slightly after borders begin to move
-      )
-      .to(glow, {
-        opacity: 0,
-        scale: 2,
+    // 1. Ribbon moves up
+    tl.to(ribbonVertical, { y: '-100%', duration: 0.4, ease: 'power2.out' }, 0)
+      .to(ribbonHorizontal, { opacity: 0, duration: 0.2 }, 0) // Fade out horizontal ribbon
+      .to(bow, { y: '-100%', opacity: 0, duration: 0.4, ease: 'power2.out' }, 0)
+      // 2. Lid opens 45 deg
+      .to(lid, {
+        rotationX: -45, // Rotate around X-axis for opening effect
+        y: '-=20', // Lift slightly
+        duration: 0.6,
+        ease: 'power2.out',
+        transformOrigin: 'bottom center',
+      }, 0.3) // Start after ribbon moves a bit
+      // 3. Lid closes and hides (to simulate bomb being thrown out and box closing)
+      .to(lid, {
+        rotationX: 0,
+        y: '0',
         duration: 0.4,
-        ease: 'power1.in',
-      }, 0.7); // Fade out glow after it peaks
+        ease: 'power2.in',
+      }, '+=0.5'); // After a short pause, close the lid
   };
 
   return (
@@ -81,40 +76,37 @@ const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className },
         "relative w-32 h-32 md:w-40 md:h-40 cursor-pointer transition-transform duration-300 hover:scale-110 overflow-hidden",
         className
       )}
-      style={{ filter: 'drop-shadow(0 0 20px #ff00ff)' }}
+      style={{ filter: 'drop-shadow(0 0 15px rgba(255, 0, 255, 0.7))' }}
     >
-      {/* Main Box Body - Dark, subtle background */}
-      <div className="absolute inset-0 bg-gray-950/50 rounded-lg" />
-
-      {/* Glowing Borders */}
+      {/* Main Box Body */}
       <div
-        ref={borderTopRef}
-        className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500"
-        style={{ boxShadow: '0 0 10px #ff00ff' }}
-      />
-      <div
-        ref={borderBottomRef}
-        className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500"
-        style={{ boxShadow: '0 0 10px #ff00ff' }}
-      />
-      <div
-        ref={borderLeftRef}
-        className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 via-pink-500 to-cyan-500"
-        style={{ boxShadow: '0 0 10px #ff00ff' }}
-      />
-      <div
-        ref={borderRightRef}
-        className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-purple-500 via-pink-500 to-cyan-500"
-        style={{ boxShadow: '0 0 10px #ff00ff' }}
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-3/4 bg-red-500 rounded-lg border-4 border-red-700"
+        style={{ boxShadow: 'inset 0 -5px 10px rgba(0,0,0,0.2)' }}
       />
 
-      {/* Internal Glow */}
+      {/* Ribbons (Horizontal and Vertical) */}
+      <div ref={ribbonHorizontalRef} className="absolute inset-0 flex items-center justify-center">
+        <div className="w-full h-8 bg-yellow-300 absolute top-1/2 -translate-y-1/2" />
+      </div>
+      <div ref={ribbonVerticalRef} className="absolute inset-0 flex items-center justify-center">
+        <div className="w-8 h-full bg-yellow-300 absolute left-1/2 -translate-x-1/2" />
+      </div>
+
+      {/* Gift Box Lid */}
       <div
-        ref={glowRef}
-        className="absolute inset-0 flex items-center justify-center"
-        style={{ zIndex: 5 }}
+        ref={lidRef}
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[110%] h-1/4 bg-red-500 rounded-lg border-4 border-red-700"
+        style={{ boxShadow: '0 5px 10px rgba(0,0,0,0.2)', transformOrigin: 'bottom center', zIndex: 10 }}
       >
-        <div className="w-2/3 h-2/3 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-cyan-500 opacity-0" style={{ filter: 'blur(20px)', boxShadow: '0 0 50px #ff00ff' }}></div>
+        {/* Ribbon on lid */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-full h-8 bg-yellow-300 absolute top-1/2 -translate-y-1/2" />
+          <div className="w-8 h-full bg-yellow-300 absolute left-1/2 -translate-x-1/2" />
+        </div>
+        {/* Bow */}
+        <div ref={bowRef} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-300 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-yellow-200 rounded-full"></div>
+        </div>
       </div>
     </div>
   );
