@@ -13,7 +13,7 @@ import BoyAndPaperAnimation from "@/components/BoyAndPaperAnimation";
 import GunAnimation from "@/components/GunAnimation";
 import BulletHole from "@/components/BulletHole";
 
-type AnimationPhase = "gift" | "burstingAndBoyAnimation" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "bursting" | "boyAnimation" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
@@ -63,7 +63,25 @@ const Surprise = () => {
 
   const handleGiftOpen = useCallback((position: { x: number; y: number }) => {
     setBurstOrigin(position); 
-    setAnimationPhase("burstingAndBoyAnimation"); 
+    setAnimationPhase("bursting"); 
+  }, []);
+
+  const handleBurstComplete = useCallback(() => {
+    const mainContentElement = mainContentRef.current; 
+
+    if (mainContentElement) {
+        gsap.to(mainContentElement, {
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power2.in',
+            onComplete: () => {
+                mainContentElement.style.display = 'none'; // Hide after fade
+                setAnimationPhase("boyAnimation"); 
+            }
+        });
+    } else {
+        setAnimationPhase("boyAnimation"); 
+    }
   }, []);
 
   const handlePhotoTrainComplete = useCallback(() => {
@@ -122,17 +140,7 @@ const Surprise = () => {
   }, []);
 
   const handleBoyAndPaperAnimationPaperCover = useCallback(() => {
-    // This callback is now responsible for fading out the initial content
-    if (mainContentRef.current) {
-        gsap.to(mainContentRef.current, {
-            opacity: 0,
-            duration: 0.8,
-            ease: 'power2.in',
-            onComplete: () => {
-                mainContentRef.current!.style.display = 'none'; // Hide after fade
-            }
-        });
-    }
+    // This callback no longer changes phase, the button will trigger photoTrain
   }, []);
 
   const handleShoot = useCallback(() => {
@@ -151,7 +159,7 @@ const Surprise = () => {
       <AudioPlayer src="/birthday-music.mp3" />
 
       {/* Main content div that holds the gift box and initial message */}
-      {(animationPhase === 'gift' || animationPhase === 'burstingAndBoyAnimation') && (
+      {animationPhase === 'gift' || animationPhase === 'bursting' && (
         <div ref={mainContentRef} className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div className="flex flex-col items-center animate-fade-in-down">
             <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
@@ -160,17 +168,17 @@ const Surprise = () => {
         </div>
       )}
 
-      {/* GiftBurst and BoyAndPaperAnimation render during the combined phase */}
-      {animationPhase === 'burstingAndBoyAnimation' && (
-        <>
-          {burstOrigin && (
-            <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} />
-          )}
-          <BoyAndPaperAnimation
-            onPaperCover={handleBoyAndPaperAnimationPaperCover}
-            onComplete={handleBoyAndPaperAnimationComplete}
-          />
-        </>
+      {/* GiftBurst renders during the 'bursting' phase */}
+      {animationPhase === 'bursting' && burstOrigin && (
+        <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} onComplete={handleBurstComplete} />
+      )}
+
+      {/* BoyAndPaperAnimation renders during the 'boyAnimation' phase */}
+      {animationPhase === 'boyAnimation' && (
+        <BoyAndPaperAnimation
+          onPaperCover={handleBoyAndPaperAnimationPaperCover}
+          onComplete={handleBoyAndPaperAnimationComplete}
+        />
       )}
 
       {/* Other animations are rendered based on their respective phases */}
