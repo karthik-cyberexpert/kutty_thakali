@@ -31,15 +31,29 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, showText, onM
       rotation: gsap.utils.random(0, 360),
     });
 
+    const scatterDuration = 1.2;
+    const scatterDelay = gsap.utils.random(0, 0.5);
+
     gsap.to(mail, {
       x: randomX,
       y: randomY,
       scale: 1,
       opacity: 1,
       rotation: gsap.utils.random(-20, 20),
-      duration: 1.2,
+      duration: scatterDuration,
       ease: 'power3.out',
-      delay: gsap.utils.random(0, 0.5), // Stagger slightly with other particles
+      delay: scatterDelay,
+      onComplete: () => {
+        // After scattering, start a continuous floating animation
+        gsap.to(mail, {
+          y: '+=15', // Move up and down by 15px
+          rotation: '+=5', // Subtle continuous rotation
+          duration: 2,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1, // Infinite repeat
+        });
+      }
     });
 
   }, [explosionOrigin]);
