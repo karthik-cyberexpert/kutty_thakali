@@ -13,7 +13,7 @@ import BoyAndPaperAnimation from "@/components/BoyAndPaperAnimation";
 import GunAnimation from "@/components/GunAnimation";
 import BulletHole from "@/components/BulletHole";
 
-type AnimationPhase = "gift" | "bursting" | "boyAnimation" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "burstingAndBoyAnimation" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
@@ -63,23 +63,18 @@ const Surprise = () => {
 
   const handleGiftOpen = useCallback((position: { x: number; y: number }) => {
     setBurstOrigin(position); 
-    setAnimationPhase("bursting"); 
-  }, []);
-
-  const handleBurstComplete = useCallback(() => {
-    const mainContentElement = mainContentRef.current; 
-
-    if (mainContentElement) {
-        gsap.to(mainContentElement, {
+    if (mainContentRef.current) {
+        gsap.to(mainContentRef.current, {
             opacity: 0,
             duration: 0.8,
             ease: 'power2.in',
             onComplete: () => {
-                setAnimationPhase("boyAnimation"); 
+                mainContentRef.current!.style.display = 'none'; // Hide after fade
+                setAnimationPhase("burstingAndBoyAnimation"); 
             }
         });
     } else {
-        setAnimationPhase("boyAnimation"); 
+        setAnimationPhase("burstingAndBoyAnimation"); 
     }
   }, []);
 
@@ -158,7 +153,7 @@ const Surprise = () => {
       <AudioPlayer src="/birthday-music.mp3" />
 
       {/* Main content div that holds the gift box and initial message */}
-      {(animationPhase === 'gift' || animationPhase === 'bursting') && (
+      {animationPhase === 'gift' && (
         <div ref={mainContentRef} className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div className="flex flex-col items-center animate-fade-in-down">
             <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
@@ -167,19 +162,20 @@ const Surprise = () => {
         </div>
       )}
 
-      {/* GiftBurst renders on top of the gift box during the 'bursting' phase */}
-      {animationPhase === 'bursting' && burstOrigin && (
-        <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} onComplete={handleBurstComplete} />
+      {/* GiftBurst and BoyAndPaperAnimation render during the combined phase */}
+      {animationPhase === 'burstingAndBoyAnimation' && (
+        <>
+          {burstOrigin && (
+            <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} />
+          )}
+          <BoyAndPaperAnimation
+            onPaperCover={handleBoyAndPaperAnimationPaperCover}
+            onComplete={handleBoyAndPaperAnimationComplete}
+          />
+        </>
       )}
 
       {/* Other animations are rendered based on their respective phases */}
-      {animationPhase === 'boyAnimation' && (
-        <BoyAndPaperAnimation
-          onPaperCover={handleBoyAndPaperAnimationPaperCover}
-          onComplete={handleBoyAndPaperAnimationComplete}
-        />
-      )}
-
       {animationPhase === 'preShootButton' && showShootButton && (
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <h2 className="text-3xl md:text-5xl font-bold mb-8 animate-fade-in-down">Ready for more magic?</h2>
