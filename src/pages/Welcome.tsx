@@ -30,13 +30,13 @@ const Welcome = () => {
             Create a Birthday Surprise!
           </h1>
           <p className="mb-8 text-lg">Enter a name for the magic.</p>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4"> {/* Adjusted gap for error message */}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
               type="text"
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
-                setError(null); // Clear error when typing
+                setError(null);
               }}
               className="bg-white/20 border-none text-white text-center text-lg placeholder:text-gray-300 focus:ring-2 focus:ring-pink-500 rounded-lg"
               placeholder="Enter a name"
@@ -46,7 +46,7 @@ const Welcome = () => {
             )}
             <Button
               type="submit"
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 mt-2" {/* Adjusted margin-top */}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 mt-2"
             >
               Create Surprise <Gift className="ml-2" />
             </Button>
