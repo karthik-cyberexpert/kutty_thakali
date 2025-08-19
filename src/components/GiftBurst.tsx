@@ -4,9 +4,10 @@ import { gsap } from 'gsap';
 interface GiftBurstProps {
   originX: number;
   originY: number;
+  onComplete?: () => void;
 }
 
-const GiftBurst = ({ originX, originY }: GiftBurstProps) => {
+const GiftBurst = ({ originX, originY, onComplete }: GiftBurstProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const numParticles = 200;
   const particles = ['💖', '✨', '🎉', '🎂', '🎈', '⭐', '🎁', '🍰', '🎊', '❤️', '🥳'];
@@ -46,9 +47,10 @@ const GiftBurst = ({ originX, originY }: GiftBurstProps) => {
       delay: 1,
       onComplete: () => {
         particleElements.forEach(p => p.remove());
+        onComplete?.(); // Call onComplete when particles are removed
       }
     });
-  }, [originX, originY]);
+  }, [originX, originY, onComplete]);
 
   return <div ref={containerRef} className="absolute inset-0 z-30 pointer-events-none" />;
 };

@@ -13,13 +13,11 @@ import BoyAndPaperAnimation from "@/components/BoyAndPaperAnimation";
 import GunAnimation from "@/components/GunAnimation";
 import BulletHole from "@/components/BulletHole";
 
-type AnimationPhase = "gift" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
+type AnimationPhase = "gift" | "bursting" | "boyAnimation" | "preShootButton" | "shooting" | "photoTrain" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [hasPlayedIntroAnimation, setHasPlayedIntroAnimation] = useState(false);
   const [showShootButton, setShowShootButton] = useState(false);
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
   const [burstOrigin, setBurstOrigin] = useState<{ x: number; y: number } | null>(null); // State to store burst origin
@@ -64,7 +62,11 @@ const Surprise = () => {
 
   const handleGiftOpen = useCallback((position: { x: number; y: number }) => {
     setBurstOrigin(position); // Set the origin for the burst
-    setIsTransitioning(true);
+    setAnimationPhase("bursting"); // Transition to bursting phase
+  }, []);
+
+  const handleBurstComplete = useCallback(() => {
+    setAnimationPhase("boyAnimation"); // Transition to boy animation after burst
   }, []);
 
   const handlePhotoTrainComplete = useCallback(() => {
@@ -73,7 +75,6 @@ const Surprise = () => {
   }, []);
 
   const handleReplay = useCallback(() => {
-    setIsTransitioning(false);
     setAnimationPhase('gift');
     setShowShootButton(false);
     setBulletHolePosition(null); // Ensure hole is hidden on replay
@@ -116,8 +117,6 @@ const Surprise = () => {
   }, []);
 
   const handleBoyAndPaperAnimationComplete = useCallback(() => {
-    setIsTransitioning(false);
-    setHasPlayedIntroAnimation(true);
     setAnimationPhase("preShootButton");
     setShowShootButton(true);
   }, []);
@@ -142,7 +141,7 @@ const Surprise = () => {
       <AudioPlayer src="/birthday-music.mp3" />
 
       <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
-        {animationPhase === 'gift' && !isTransitioning && (
+        {animationPhase === 'gift' && (
           <div className="flex flex-col items-center animate-fade-in-down">
             <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
             <GiftBox ref={giftBoxRef} onOpen={handleGiftOpen} />
@@ -186,6 +185,17 @@ const Surprise = () => {
       </div>
 
       {/* Full-screen animations are now siblings to the main content div */}
+      {animationPhase === 'bursting' && burstOrigin && (
+        <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} onComplete={handleBurstComplete} />
+      )}
+
+      {animationPhase === 'boyAnimation' && (
+        <BoyAndPaperAnimation
+          onPaperCover={handleBoyAndPaperAnimationPaperCover}
+          onComplete={handleBoyAndPaperAnimationComplete}
+        />
+      )}
+
       {animationPhase === 'shooting' && (
         <GunAnimation onShotComplete={handleGunShotComplete} />
       )}
@@ -195,16 +205,6 @@ const Surprise = () => {
           <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />
           <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />
         </>
-      )}
-
-      {isTransitioning && !hasPlayedIntroAnimation && burstOrigin && (
-        <div className="absolute inset-0 z-20">
-          <GiftBurst originX={burstOrigin.x} originY={burstOrigin.y} />
-          <BoyAndPaperAnimation
-            onPaperCover={handleBoyAndPaperAnimationPaperCover}
-            onComplete={handleBoyAndPaperAnimationComplete}
-          />
-        </div>
       )}
     </div>
   );
