@@ -58,7 +58,7 @@ const MailboxAndLetter: React.FC<MailboxAndLetterProps> = ({ birthdayMessage, on
 
   return (
     <div ref={containerRef} className="absolute inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-sm p-4">
-      <div ref={mailboxRef} className="relative w-80 h-60 md:w-96 md:h-72 bg-gray-700 rounded-lg shadow-2xl border-4 border-gray-800 flex flex-col items-center justify-end overflow-hidden">
+      <div ref={mailboxRef} className="relative w-80 h-96 md:w-96 md:h-[500px] bg-gray-700 rounded-lg shadow-2xl border-4 border-gray-800 flex flex-col items-center justify-end overflow-hidden">
         {/* Mailbox Body */}
         <div className="w-full h-full bg-gray-600 rounded-b-lg" />
 
@@ -72,10 +72,10 @@ const MailboxAndLetter: React.FC<MailboxAndLetterProps> = ({ birthdayMessage, on
         {/* Letter */}
         <div
           ref={letterRef}
-          className="absolute w-[80%] h-[80%] bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between items-center text-center text-gray-800"
+          className="absolute w-[80%] h-[90%] bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between items-center text-center text-gray-800 border border-gray-200"
           style={{ transform: 'translateY(100%)' }}
         >
-          <p className="text-xl md:text-2xl font-script text-purple-800 leading-relaxed mb-4">
+          <p className="text-xl md:text-2xl font-script text-purple-800 leading-relaxed mb-4 flex-grow overflow-y-auto">
             {birthdayMessage}
           </p>
           <Button
@@ -83,7 +83,7 @@ const MailboxAndLetter: React.FC<MailboxAndLetterProps> = ({ birthdayMessage, on
             onClick={handleCloseClick}
             className={cn(
               "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-8 text-lg rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105",
-              "w-full max-w-xs" // Ensure it's rectangular and has a max width
+              "w-full max-w-xs mt-auto"
             )}
           >
             Close
