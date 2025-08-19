@@ -5,7 +5,7 @@ import ParticlesBackground from '@/components/ParticlesBackground';
 import GunAnimation from '@/components/GunAnimation';
 import BulletHole from '@/components/BulletHole';
 import PhotoTrain from '@/components/PhotoTrain';
-import { ArrowLeft, Target } from 'lucide-react';
+import { Target } from 'lucide-react'; // Removed ArrowLeft
 import { gsap } from 'gsap';
 
 const MailContent = () => {
@@ -60,14 +60,6 @@ const MailContent = () => {
             {bulletHolePosition && <PhotoTrain images={images} onComplete={handlePhotoTrainComplete} holePosition={bulletHolePosition} />}
           </>
         )}
-
-        <Button
-          onClick={() => navigate(-1)} // Go back to previous page
-          variant="ghost"
-          className="absolute top-4 left-4 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 z-50"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
-        </Button>
       </div>
     </div>
   );
