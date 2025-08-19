@@ -63,7 +63,7 @@ const WaveTransition: React.FC<WaveTransitionProps> = ({ onComplete, onCover }) 
       {Array.from({ length: NUM_STRIPS }).map((_, i) => (
         <div
           key={i}
-          className="absolute bg-gradient-to-r from-blue-500 to-blue-700" // Changed from bg-white to blue gradient
+          className="absolute bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500" // Changed to rainbow gradient
           style={{
             height: `${STRIP_HEIGHT_VH}vh`,
             top: `${i * STRIP_HEIGHT_VH}vh`,
