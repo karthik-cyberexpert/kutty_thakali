@@ -30,6 +30,7 @@ const Balloon = forwardRef<any, BalloonProps>(({
   const imageRef = useRef<HTMLImageElement>(null);
   const [internalIsBurst, setInternalIsBurst] = useState(propIsBurst);
   const [showImage, setShowImage] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState(false); // New state for image loading error
 
   useImperativeHandle(ref, () => ({
     cutRopeAndFly,
@@ -42,7 +43,7 @@ const Balloon = forwardRef<any, BalloonProps>(({
       setInternalIsBurst(true);
       burstBalloon();
     }
-  }, [propIsBurst]);
+  }, [propIsBurst, internalIsBurst]);
 
   useEffect(() => {
     const balloon = balloonRef.current;
@@ -94,15 +95,17 @@ const Balloon = forwardRef<any, BalloonProps>(({
   const burstBalloon = () => {
     const balloon = balloonRef.current;
     const image = imageRef.current;
-    if (!balloon || !image) return;
+    if (!balloon) return; // Image might not be rendered yet if showImage is false
 
     gsap.timeline({
       onComplete: () => {
-        setShowImage(true); // Show image after burst animation
-        gsap.fromTo(image,
-          { opacity: 0, scale: 0.8 },
-          { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.7)' }
-        );
+        setShowImage(true); // Ensure image is rendered
+        if (image) { // Check if image ref is available after rendering
+            gsap.fromTo(image,
+              { opacity: 0, scale: 0.8 },
+              { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.7)' }
+            );
+        }
         onBurst?.(id); // Notify parent
       }
     })
@@ -124,10 +127,15 @@ const Balloon = forwardRef<any, BalloonProps>(({
     }
   };
 
+  const handleImageError = () => {
+    setImageLoadError(true);
+    console.error(`Failed to load image: ${imageSrc} for balloon ${id}`);
+  };
+
   return (
     <div
       className={cn(
-        "absolute flex flex-col items-center justify-center",
+        "relative flex flex-col items-center justify-center", // Changed absolute to relative for grid items
         isInitialBalloon ? "z-30" : "z-20", // Initial balloon on top, grid balloons below gun/hole
         className
       )}
@@ -157,13 +165,19 @@ const Balloon = forwardRef<any, BalloonProps>(({
         </>
       )}
       {showImage && (
-        <img
-          ref={imageRef}
-          src={imageSrc}
-          alt={`Balloon burst image ${id}`}
-          className="absolute w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg shadow-lg border-2 border-white"
-          // Removed style={{ opacity: 0 }} from here
-        />
+        imageLoadError ? (
+          <div className="absolute w-24 h-24 md:w-32 md:h-32 flex items-center justify-center rounded-lg border-2 border-red-500 bg-red-200 text-red-800 text-center text-xs font-bold z-30">
+            Error loading image {id}
+          </div>
+        ) : (
+          <img
+            ref={imageRef}
+            src={imageSrc}
+            alt={`Balloon burst image ${id}`}
+            className="absolute w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg shadow-lg border-2 border-white z-30" // Added z-index
+            onError={handleImageError} // Added error handler
+          />
+        )
       )}
     </div>
   );
