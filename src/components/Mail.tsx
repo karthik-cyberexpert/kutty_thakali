@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { Mail as MailIcon } from 'lucide-react'; // Import Mail icon
 
 interface MailProps {
   explosionOrigin: { x: number; y: number }; // Where the explosion happened
@@ -15,7 +16,7 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     if (!mail) return;
 
     // Define a central area for the mail icon to scatter to (e.g., central 40% of the screen)
-    const centralAreaPercentage = 0.4; 
+    const centralAreaPercentage = 0.4;
     const minX = window.innerWidth * (0.5 - centralAreaPercentage / 2);
     const maxX = window.innerWidth * (0.5 + centralAreaPercentage / 2);
     const minY = window.innerHeight * (0.5 - centralAreaPercentage / 2);
@@ -85,10 +86,10 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     <div
       ref={mailRef}
       onClick={handleClick}
-      className="absolute z-50 flex flex-col items-center justify-center cursor-pointer text-white text-7xl" // Reduced size to text-7xl
+      className="absolute z-50 flex flex-col items-center justify-center cursor-pointer text-white" // Removed text-7xl, will use size prop on icon
       style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(0,255,255,0.8)' }}
     >
-      ✉️
+      <MailIcon size={100} /> {/* Use MailIcon with a specific size */}
     </div>
   );
 };
