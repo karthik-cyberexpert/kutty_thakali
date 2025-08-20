@@ -15,6 +15,8 @@ const ShotImage: React.FC<ShotImageProps> = ({ src, holePosition, index }) => {
     const element = imageRef.current;
     if (!element) return;
 
+    console.log(`Attempting to load image: ${src}`); // Log the source path
+
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
     const imageWidth = 192; // w-48 is 12rem = 192px
