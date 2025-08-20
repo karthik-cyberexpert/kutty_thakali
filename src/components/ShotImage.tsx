@@ -8,81 +8,60 @@ interface ShotImageProps {
 }
 
 const ShotImage: React.FC<ShotImageProps> = ({ src, holePosition, index }) => {
-  const imageRef = useRef<HTMLImageElement | HTMLDivElement>(null); // Can be img or div
-  const [imageLoaded, setImageLoaded] = useState(true); // Assume loaded initially, set to false on error
+  const imageRef = useRef<HTMLImageElement | HTMLDivElement>(null);
+  const [imageLoaded, setImageLoaded] = useState(true);
 
   useEffect(() => {
     const element = imageRef.current;
     if (!element) return;
 
-    console.log(`Attempting to load image: ${src}`); // Log the source path
+    console.log(`Attempting to load image: ${src}`);
 
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const imageWidth = 192; // w-48 is 12rem = 192px
-    const imageHeight = 192;
-
-    // Define padding from edges to ensure images stay on screen
-    const paddingX = screenWidth * 0.05; // 5% padding from left/right
-    const paddingY = screenHeight * 0.05; // 5% padding from top/bottom
-
-    // Initial position for element: inside the hole, scaled down
+    // Initial state: slightly scaled down and fully transparent
     gsap.set(element, {
-      x: holePosition.x,
-      y: holePosition.y,
-      xPercent: -50,
-      yPercent: -50,
-      scale: 0,
       opacity: 0,
+      scale: 0.8,
+      // Position them roughly in the center, with a slight random offset
+      // This will make them appear around the center, not exactly on top of each other
+      x: window.innerWidth / 2 + gsap.utils.random(-50, 50),
+      y: window.innerHeight / 2 + gsap.utils.random(-50, 50),
+      xPercent: -50, // Center the element based on its own dimensions
+      yPercent: -50,
+      rotation: gsap.utils.random(-10, 10), // Small initial random rotation
     });
 
-    // Animate element emerging from the hole and scattering across the screen
+    // Fade-in animation
     gsap.to(element, {
-      scale: 1,
       opacity: 1,
-      // Ensure images land within the screen bounds with padding
-      x: gsap.utils.random(paddingX, screenWidth - paddingX),
-      y: gsap.utils.random(paddingY, screenHeight - paddingY),
-      rotation: gsap.utils.random(-20, 20),
-      duration: 1.5,
+      scale: 1,
+      rotation: 0, // Settle to no rotation or a slight final rotation
+      duration: 0.8, // Fade in duration
       ease: 'power2.out',
-      delay: index * 0.05, // Stagger based on index
-      onComplete: () => {
-        // Add subtle floating animation after landing
-        gsap.to(element, {
-          y: '+=10', // Move up by 10px
-          scale: 1.02, // Slightly larger
-          rotation: '+=2', // Slight rotation
-          duration: 2, // Duration of one float cycle
-          ease: 'sine.inOut',
-          yoyo: true, // Go back and forth
-          repeat: -1, // Infinite repeat
-        });
-      }
+      delay: index * 0.1, // Stagger the fade-in for each image
     });
 
-  }, [src, holePosition, index, imageLoaded]); // Re-run effect if imageLoaded changes
+  }, [src, index, imageLoaded]);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error(`Failed to load image: ${src}`, e);
-    setImageLoaded(false); // Set state to false on error
+    setImageLoaded(false);
   };
 
   return (
     <>
       {imageLoaded ? (
         <img
-          ref={imageRef as React.RefObject<HTMLImageElement>} // Cast ref for img element
+          ref={imageRef as React.RefObject<HTMLImageElement>}
           src={src}
           alt={`Surprise image ${index + 1}`}
-          className="absolute w-48 h-48 object-cover rounded-2xl border-4 border-pink-400 shadow-lg bg-white z-35" // Changed z-index to z-35
+          className="absolute w-48 h-48 object-cover rounded-2xl border-4 border-pink-400 shadow-lg bg-white z-35"
           style={{ boxShadow: '0 0 15px #ff00ff, 0 0 25px #ff00ff' }}
           onError={handleImageError}
         />
       ) : (
         <div
-          ref={imageRef as React.RefObject<HTMLDivElement>} // Cast ref for div element
-          className="absolute w-48 h-48 flex items-center justify-center rounded-2xl border-4 border-red-500 shadow-lg bg-red-200 text-red-800 text-center text-sm font-bold z-35" // Changed z-index to z-35
+          ref={imageRef as React.RefObject<HTMLDivElement>}
+          className="absolute w-48 h-48 flex items-center justify-center rounded-2xl border-4 border-red-500 shadow-lg bg-red-200 text-red-800 text-center text-sm font-bold z-35"
           style={{ boxShadow: '0 0 15px #ff00ff, 0 0 25px #ff00ff' }}
         >
           Image Failed to Load: {index + 1}
