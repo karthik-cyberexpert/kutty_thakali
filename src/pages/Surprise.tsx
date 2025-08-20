@@ -26,7 +26,7 @@ const Surprise = () => {
   const [isGiftBurstFading, setIsGiftBurstFading] = useState(false);
   const [showFindMailText, setShowFindMailText] = useState(false);
 
-  // Removed isMessageBlurred state, GSAP will handle blur directly
+  const [isMessageBlurred, setIsMessageBlurred] = useState(true); // Reintroduced state for message blur
   const [showRocketRevealAnimation, setShowRocketRevealAnimation] = useState(false);
   const [showRocketText, setShowRocketText] = useState(false);
 
@@ -54,31 +54,23 @@ const Surprise = () => {
       setExplosionOrigin(null);
       setIsGiftBurstFading(false);
       setShowFindMailText(false);
-      // No need to set isMessageBlurred here
+      setIsMessageBlurred(true); // Ensure message starts blurred
       setShowRocketRevealAnimation(false);
       setShowRocketText(false);
       setShowRevealButton(true); // Show "Reveal Text" button initially
       setShowRocketTriggerButton(false); // Hide "Show Surprise" button
       setShowReplayButton(false); // Hide "Replay" button
-
-      // Set initial blur for the message when entering this phase
-      if (messageRef.current) {
-        gsap.set(messageRef.current, { filter: 'blur(10px)' });
-      }
     }
   }, [location.state]);
 
   useEffect(() => {
     if (animationPhase === "finalMessage") {
       const revealButton = revealButtonRef.current;
-      const message = messageRef.current;
 
-      if (!revealButton || !message) return;
+      if (!revealButton) return;
 
       // Initial states for buttons in finalMessage phase
       gsap.set(revealButton, { opacity: 0, y: 20 });
-      // Ensure message is blurred initially (redundant with previous useEffect but safe)
-      gsap.set(message, { filter: 'blur(10px)' });
 
       // Animate to show the "Reveal Text" button directly
       gsap.timeline()
@@ -117,24 +109,31 @@ const Surprise = () => {
 
   const handleRevealText = useCallback(() => {
     const revealButton = revealButtonRef.current;
-    const message = messageRef.current;
     const rocketTriggerButton = rocketTriggerButtonRef.current;
 
-    if (!revealButton || !message || !rocketTriggerButton) return;
+    if (!revealButton || !rocketTriggerButton) return;
+
+    // Unblur the message
+    setIsMessageBlurred(false);
 
     gsap.timeline()
       .to(revealButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in', onComplete: () => {
           setShowRevealButton(false); // Hide the "Reveal Text" button
       }})
-      .to(message, { filter: 'blur(0px)', duration: 1.5, ease: 'power2.out' }, 0) // Unblur the message
-      .to(message, { filter: 'blur(10px)', duration: 1.5, ease: 'power2.in', delay: 6 }) // Re-blur the message after 6 seconds
-      .fromTo(rocketTriggerButton,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out', onStart: () => {
-            setShowRocketTriggerButton(true); // Make sure it's rendered
-        }},
-        "<" // Start at the same time as message re-blur
-      );
+      .call(() => {
+          // Re-blur the message after 6 seconds
+          setTimeout(() => {
+              setIsMessageBlurred(true);
+              // Show the "Show Surprise" button
+              gsap.fromTo(rocketTriggerButton,
+                  { opacity: 0, y: 20 },
+                  { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out', onStart: () => {
+                      setShowRocketTriggerButton(true);
+                  }}
+              );
+          }, 6000); // 6 seconds delay
+      }, [], 0); // Start this call immediately with the button fade out
+
   }, []);
 
   const handleTriggerRocket = useCallback(() => {
@@ -176,7 +175,7 @@ const Surprise = () => {
     setExplosionOrigin(null);
     setIsGiftBurstFading(false);
     setShowFindMailText(false);
-    // No need to reset isMessageBlurred here, GSAP will handle initial blur
+    setIsMessageBlurred(true); // Reset for replay
     setShowRocketRevealAnimation(false);
     setShowRocketText(false);
     setShowRevealButton(true); // Reset for replay
@@ -247,7 +246,7 @@ const Surprise = () => {
           {/* Original blurred message (visible until "Reveal Text" is clicked) */}
           <div
             ref={messageRef}
-            className={`font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400`}
+            className={`font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 ${isMessageBlurred ? 'blur-lg' : ''}`}
             style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
           >
             {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block">{char === ' ' ? '\u00A0' : char}</span>)}
