@@ -59,7 +59,7 @@ const BalloonsGridPage = () => {
           balloonRefs.current[currentBurstIndex].burstBalloon();
         }
         setCurrentBurstIndex(prevIndex => prevIndex + 1);
-      }, 2000); // Burst every 2 seconds
+      }, 450); // Burst every 0.45 seconds
 
       return () => clearTimeout(timer);
     }
