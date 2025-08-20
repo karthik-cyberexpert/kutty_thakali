@@ -15,53 +15,20 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     const mail = mailRef.current;
     if (!mail) return;
 
-    // Define a central area for the mail icon to scatter to (e.g., central 40% of the screen)
-    const centralAreaPercentage = 0.4;
-    const minX = window.innerWidth * (0.5 - centralAreaPercentage / 2);
-    const maxX = window.innerWidth * (0.5 + centralAreaPercentage / 2);
-    const minY = window.innerHeight * (0.5 - centralAreaPercentage / 2);
-    const maxY = window.innerHeight * (0.5 + centralAreaPercentage / 2);
+    // Ensure it's visible and clickable from the start of this phase
+    gsap.set(mail, { opacity: 1, scale: 1, rotation: 0 }); // Reset any previous GSAP states if component re-renders
 
-    // Initial random position for the mail icon, scattering from the explosion origin
-    const randomX = gsap.utils.random(minX, maxX);
-    const randomY = gsap.utils.random(minY, maxY);
-
-    gsap.set(mail, {
-      x: explosionOrigin.x,
-      y: explosionOrigin.y,
-      xPercent: -50, // Center the icon
-      yPercent: -50,
-      scale: 0,
-      opacity: 0,
-      rotation: gsap.utils.random(0, 360),
-    });
-
-    const scatterDuration = 1.2;
-    const scatterDelay = gsap.utils.random(0, 0.5);
-
+    // Start a continuous floating animation immediately
     gsap.to(mail, {
-      x: randomX,
-      y: randomY,
-      scale: 1,
-      opacity: 1,
-      rotation: gsap.utils.random(-20, 20),
-      duration: scatterDuration,
-      ease: 'power3.out',
-      delay: scatterDelay,
-      onComplete: () => {
-        // After scattering, start a continuous floating animation
-        gsap.to(mail, {
-          y: '+=15', // Move up and down by 15px
-          rotation: '+=5', // Subtle continuous rotation
-          duration: 2,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1, // Infinite repeat
-        });
-      }
+      y: '+=15', // Move up and down by 15px
+      rotation: '+=5', // Subtle continuous rotation
+      duration: 2,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1, // Infinite repeat
     });
 
-  }, [explosionOrigin]);
+  }, []); // No dependencies, runs once on mount
 
   const handleClick = () => {
     const mail = mailRef.current;
@@ -86,7 +53,8 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     <div
       ref={mailRef}
       onClick={handleClick}
-      className="absolute z-50 cursor-pointer text-white" // Removed flex classes
+      // Use flexbox to center the content within the absolute container
+      className="absolute inset-0 flex items-center justify-center z-50 cursor-pointer text-white"
       style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(0,255,255,0.8)' }}
     >
       <MailIcon size={100} /> {/* Use MailIcon with a specific size */}
