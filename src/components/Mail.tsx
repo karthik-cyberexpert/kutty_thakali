@@ -86,7 +86,7 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     <div
       ref={mailRef}
       onClick={handleClick}
-      className="absolute z-50 flex flex-col items-center justify-center cursor-pointer text-white" // Removed text-7xl, will use size prop on icon
+      className="absolute z-50 cursor-pointer text-white" // Removed flex classes
       style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(0,255,255,0.8)' }}
     >
       <MailIcon size={100} /> {/* Use MailIcon with a specific size */}
