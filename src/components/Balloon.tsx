@@ -162,7 +162,7 @@ const Balloon = forwardRef<any, BalloonProps>(({
           src={imageSrc}
           alt={`Balloon burst image ${id}`}
           className="absolute w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg shadow-lg border-2 border-white"
-          style={{ opacity: 0 }} // Initially hidden
+          // Removed style={{ opacity: 0 }} from here
         />
       )}
     </div>
