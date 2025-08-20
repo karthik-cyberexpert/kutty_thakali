@@ -26,18 +26,20 @@ const Surprise = () => {
   const [isGiftBurstFading, setIsGiftBurstFading] = useState(false);
   const [showFindMailText, setShowFindMailText] = useState(false);
 
-  const [showOriginalBirthdayMessage, setShowOriginalBirthdayMessage] = useState(true);
+  const [isMessageBlurred, setIsMessageBlurred] = useState(true); // New state for message blur
   const [showRocketRevealAnimation, setShowRocketRevealAnimation] = useState(false);
   const [showRocketText, setShowRocketText] = useState(false);
   const [showFinalGiftBox, setShowFinalGiftBox] = useState(true);
 
-  // New states for button visibility
-  const [showShowButton, setShowShowButton] = useState(false); // Will be set true when finalMessage phase starts
-  const [showReplayButton, setShowReplayButton] = useState(false); // Will be set true after rocket animation completes
+  // States for button visibility
+  const [showRevealButton, setShowRevealButton] = useState(false); // Controls "Reveal Text" button
+  const [showRocketTriggerButton, setShowRocketTriggerButton] = useState(false); // Controls "Show Surprise" button
+  const [showReplayButton, setShowReplayButton] = useState(false); // Controls "Replay" button
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
-  const revealButtonRef = useRef<HTMLButtonElement>(null);
+  const revealButtonRef = useRef<HTMLButtonElement>(null); // Ref for "Reveal Text" button
+  const rocketTriggerButtonRef = useRef<HTMLButtonElement>(null); // Ref for "Show Surprise" button
   const replayButtonRef = useRef<HTMLButtonElement>(null);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const findMailTextRef = useRef<HTMLDivElement>(null);
@@ -54,12 +56,13 @@ const Surprise = () => {
       setExplosionOrigin(null);
       setIsGiftBurstFading(false);
       setShowFindMailText(false);
-      setShowOriginalBirthdayMessage(true);
+      setIsMessageBlurred(true); // Start with message blurred
       setShowRocketRevealAnimation(false);
       setShowRocketText(false);
       setShowFinalGiftBox(true);
-      setShowShowButton(true); // Set show button to true when entering finalMessage phase
-      setShowReplayButton(false); // Ensure replay button is false
+      setShowRevealButton(true); // Show "Reveal Text" button initially
+      setShowRocketTriggerButton(false); // Hide "Show Surprise" button
+      setShowReplayButton(false); // Hide "Replay" button
     }
   }, [location.state]);
 
@@ -68,13 +71,12 @@ const Surprise = () => {
       const gift = finalGiftRef.current;
       const revealButton = revealButtonRef.current;
 
-      if (!gift || !revealButton) return; // Replay button is handled separately now
+      if (!gift || !revealButton) return;
 
-      // Initial states for buttons and messages in finalMessage phase
+      // Initial states for buttons in finalMessage phase
       gsap.set(revealButton, { opacity: 0, y: 20, pointerEvents: 'none' });
-      // Replay button initial state is handled by its own conditional rendering
 
-      // Animate gift and then show the "Show" button
+      // Animate gift and then show the "Reveal Text" button
       gsap.timeline()
         .fromTo(gift, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 1, ease: 'bounce.out' })
         .to(gift, {
@@ -119,15 +121,32 @@ const Surprise = () => {
     setShowFindMailText(false);
   }, []);
 
-  const handleShow = useCallback(() => {
+  const handleRevealText = useCallback(() => {
     const revealButton = revealButtonRef.current;
-    if (!revealButton) return;
+    const message = messageRef.current;
+    const rocketTriggerButton = rocketTriggerButtonRef.current;
+
+    if (!revealButton || !message || !rocketTriggerButton) return;
 
     gsap.to(revealButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in', onComplete: () => {
-        setShowShowButton(false); // Hide the "Show" button completely
+        setShowRevealButton(false); // Hide the "Reveal Text" button
+        setIsMessageBlurred(false); // Unblur the message
+        gsap.to(message, { filter: 'blur(0px)', duration: 1.5, ease: 'power2.out' }); // Animate unblur
+        
+        // After unblur, show the "Show Surprise" button
+        gsap.fromTo(rocketTriggerButton, { opacity: 0, y: 20 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out', delay: 0.5 });
+        setShowRocketTriggerButton(true); // Make sure it's rendered
     }});
-    setShowOriginalBirthdayMessage(false);
-    setShowRocketRevealAnimation(true);
+  }, []);
+
+  const handleTriggerRocket = useCallback(() => {
+    const rocketTriggerButton = rocketTriggerButtonRef.current;
+    if (!rocketTriggerButton) return;
+
+    gsap.to(rocketTriggerButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in', onComplete: () => {
+        setShowRocketTriggerButton(false); // Hide the "Show Surprise" button
+    }});
+    setShowRocketRevealAnimation(true); // Start the rocket animation
   }, []);
 
   const handleRocketRevealText = useCallback(() => {
@@ -159,11 +178,12 @@ const Surprise = () => {
     setExplosionOrigin(null);
     setIsGiftBurstFading(false);
     setShowFindMailText(false);
-    setShowOriginalBirthdayMessage(true);
+    setIsMessageBlurred(true); // Reset for replay
     setShowRocketRevealAnimation(false);
     setShowRocketText(false);
     setShowFinalGiftBox(true);
-    setShowShowButton(true); // Reset for replay
+    setShowRevealButton(true); // Reset for replay
+    setShowRocketTriggerButton(false); // Reset for replay
     setShowReplayButton(false); // Reset for replay
     if (mainContentRef.current) {
         gsap.set(mainContentRef.current, { opacity: 1, display: 'flex' });
@@ -231,21 +251,26 @@ const Surprise = () => {
           {/* Confetti (appears when gift is hidden) */}
           {!showFinalGiftBox && <Confetti />}
 
-          {/* Original blurred message (visible until "Show" is clicked) */}
-          {showOriginalBirthdayMessage && (
-            <div
-              ref={messageRef}
-              className="font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400"
-              style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)', filter: 'blur(16px)' }}
-            >
-              {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block">{char === ' ' ? '\u00A0' : char}</span>)}
-            </div>
+          {/* Original blurred message (visible until "Reveal Text" is clicked) */}
+          <div
+            ref={messageRef}
+            className={`font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 ${isMessageBlurred ? 'blur-lg' : ''}`}
+            style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
+          >
+            {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block">{char === ' ' ? '\u00A0' : char}</span>)}
+          </div>
+
+          {/* "Reveal Text" button */}
+          {showRevealButton && (
+            <Button ref={revealButtonRef} onClick={handleRevealText} className="mt-8 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
+              <Eye className="mr-2 h-4 w-4" /> Reveal Text
+            </Button>
           )}
 
-          {/* "Show" button */}
-          {showShowButton && (
-            <Button ref={revealButtonRef} onClick={handleShow} className="mt-8 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
-              <Eye className="mr-2 h-4 w-4" /> Show
+          {/* "Show Surprise" button (for rocket animation) */}
+          {showRocketTriggerButton && (
+            <Button ref={rocketTriggerButtonRef} onClick={handleTriggerRocket} className="mt-8 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
+              <Eye className="mr-2 h-4 w-4" /> Show Surprise
             </Button>
           )}
 
