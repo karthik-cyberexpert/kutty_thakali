@@ -75,14 +75,14 @@ const ShotImage: React.FC<ShotImageProps> = ({ src, holePosition, index }) => {
           ref={imageRef as React.RefObject<HTMLImageElement>} // Cast ref for img element
           src={src}
           alt={`Surprise image ${index + 1}`}
-          className="absolute w-48 h-48 object-cover rounded-2xl border-4 border-pink-400 shadow-lg bg-white z-20" // Added z-20
+          className="absolute w-48 h-48 object-cover rounded-2xl border-4 border-pink-400 shadow-lg bg-white z-35" // Changed z-index to z-35
           style={{ boxShadow: '0 0 15px #ff00ff, 0 0 25px #ff00ff' }}
           onError={handleImageError}
         />
       ) : (
         <div
           ref={imageRef as React.RefObject<HTMLDivElement>} // Cast ref for div element
-          className="absolute w-48 h-48 flex items-center justify-center rounded-2xl border-4 border-red-500 shadow-lg bg-red-200 text-red-800 text-center text-sm font-bold z-20" // Added z-20
+          className="absolute w-48 h-48 flex items-center justify-center rounded-2xl border-4 border-red-500 shadow-lg bg-red-200 text-red-800 text-center text-sm font-bold z-35" // Changed z-index to z-35
           style={{ boxShadow: '0 0 15px #ff00ff, 0 0 25px #ff00ff' }}
         >
           Image Failed to Load: {index + 1}
