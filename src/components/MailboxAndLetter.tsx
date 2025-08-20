@@ -24,21 +24,20 @@ const MailboxAndLetter: React.FC<MailboxAndLetterProps> = ({ birthdayMessage, on
 
     if (!container || !mailbox || !lid || !letter || !closeButton) return;
 
-    // Initial states
-    gsap.set(container, { opacity: 0, scale: 0.8 });
+    // Initial states - Mailbox container is now immediately visible and centered
+    // Removed gsap.set(container, { opacity: 0, scale: 0.8 });
     gsap.set(lid, { rotationX: 0, transformOrigin: 'bottom center' });
     gsap.set(letter, { y: '100%', opacity: 0 });
     gsap.set(closeButton, { opacity: 0, y: 20 });
 
-    const tl = gsap.timeline({ delay: 0.5 });
+    const tl = gsap.timeline({ delay: 0.5 }); // Keep a small delay for overall sequence
 
-    // 1. Mailbox appears
-    tl.to(container, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' })
-      // 2. Lid opens
-      .to(lid, { rotationX: -90, duration: 0.5, ease: 'power2.out' }, '+=0.5')
-      // 3. Letter slides out
+    // 1. Lid opens (starts after initial delay)
+    // Removed tl.to(container, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' })
+    tl.to(lid, { rotationX: -90, duration: 0.5, ease: 'power2.out' })
+      // 2. Letter slides out
       .to(letter, { y: '0%', opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.2')
-      // 4. Close button appears
+      // 3. Close button appears
       .to(closeButton, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '+=0.5');
 
   }, []);
