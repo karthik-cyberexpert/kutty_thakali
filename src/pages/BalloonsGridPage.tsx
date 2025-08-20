@@ -58,29 +58,6 @@ const BalloonsGridPage = () => {
     });
   }, []);
 
-  // Effect for automatic balloon popping
-  useEffect(() => {
-    if (allBalloonsBurst) return; // Stop if all are burst
-
-    let popIndex = 0;
-    const interval = setInterval(() => {
-        // Find the next unburst balloon
-        while (popIndex < balloons.length && balloons[popIndex].isBurst) {
-            popIndex++;
-        }
-
-        if (popIndex < balloons.length) {
-            handleBalloonBurst(balloons[popIndex].id);
-            popIndex++;
-        } else {
-            clearInterval(interval); // All burst, stop interval
-        }
-    }, 2000); // Pop every 2 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount or re-render
-  }, [balloons, allBalloonsBurst, handleBalloonBurst]);
-
-
   // Effect to handle automatic navigation after all balloons are burst
   useEffect(() => {
     let timer: NodeJS.Timeout;

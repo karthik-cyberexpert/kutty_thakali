@@ -95,7 +95,7 @@ const Balloon = forwardRef<any, BalloonProps>(({
   const burstBalloon = () => {
     const balloon = balloonRef.current;
     const image = imageRef.current;
-    if (!balloon) return;
+    if (!balloon) return; // Image might not be rendered yet if showImage is false
 
     gsap.timeline({
       onComplete: () => {
@@ -112,7 +112,6 @@ const Balloon = forwardRef<any, BalloonProps>(({
     .to(balloon, {
       scale: 1.2, // Pop out slightly
       opacity: 0, // Fade out
-      rotation: gsap.utils.random(-15, 15), // Add a slight rotation for pop effect
       duration: 0.2,
       ease: 'power1.out',
       onStart: () => {
@@ -122,11 +121,10 @@ const Balloon = forwardRef<any, BalloonProps>(({
   };
 
   const handleClick = () => {
-    // For grid balloons, the popping is now automated, so manual click is disabled
-    // if (!isInitialBalloon && !internalIsBurst) {
-    //   setInternalIsBurst(true); // Set internal state to trigger burst
-    //   burstBalloon();
-    // }
+    if (!isInitialBalloon && !internalIsBurst) {
+      setInternalIsBurst(true); // Set internal state to trigger burst
+      burstBalloon();
+    }
   };
 
   const handleImageError = () => {

@@ -9,7 +9,7 @@ import { gsap } from 'gsap';
 import ClickableGun from '@/components/ClickableGun';
 import Balloon from '@/components/Balloon'; // Import the new Balloon component
 
-type MailContentPhase = 'mailbox' | 'gunActive'; // Simplified phases
+type MailContentPhase = 'mailbox' | 'initialShoot' | 'gunActive';
 
 const MailContent = () => {
   const { name } = useParams();
@@ -17,7 +17,7 @@ const MailContent = () => {
   const location = useLocation();
 
   const [currentPhase, setCurrentPhase] = useState<MailContentPhase>(
-    location.state?.fromMailOpen ? 'mailbox' : 'gunActive' // Start directly with gunActive if not from mailbox
+    location.state?.fromMailOpen ? 'mailbox' : 'initialShoot'
   );
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
   const balloonRef = useRef<{ cutRopeAndFly: () => void }>(null); // Ref to call method on Balloon
@@ -30,26 +30,29 @@ const MailContent = () => {
   const holeTargetY = window.innerHeight * 0.5;
 
   const handleMailboxClose = useCallback(() => {
-    setCurrentPhase('gunActive');
+    setCurrentPhase('initialShoot');
   }, []);
 
-  const handleGunClick = useCallback(() => {
-    // Set the bullet hole position immediately when gun is clicked
+  const handleShootNow = useCallback(() => {
+    setCurrentPhase('gunActive');
+    // Set the bullet hole position immediately when gun becomes active
     setBulletHolePosition({ x: holeTargetX, y: holeTargetY });
+  }, [holeTargetX, holeTargetY]);
 
+  const handleGunClick = useCallback(() => {
     if (balloonRef.current) {
       balloonRef.current.cutRopeAndFly(); // Trigger the balloon's animation
     }
-  }, [holeTargetX, holeTargetY]);
+  }, []);
 
   const handleInitialBalloonFlyUpComplete = useCallback(() => {
     // Once the first balloon flies up, navigate to the new BalloonsGridPage
     navigate(`/balloons-grid/${name}`, { state: { flyingBalloonIndex: 22 } }); // Pass index for the 23rd balloon (0-indexed)
   }, [name, navigate]);
 
-  // Effect for initial page content animation (only for gunActive phase)
+  // Effect for initial page content animation
   useEffect(() => {
-    if (currentPhase === 'gunActive') {
+    if (currentPhase === 'initialShoot' || currentPhase === 'gunActive') {
       gsap.fromTo(".mail-content-container",
         { opacity: 0, y: 50 },
         { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
@@ -65,20 +68,33 @@ const MailContent = () => {
         <MailboxAndLetter birthdayMessage={birthdayMessage} onClose={handleMailboxClose} />
       )}
 
-      {currentPhase === 'gunActive' && (
+      {(currentPhase === 'initialShoot' || currentPhase === 'gunActive') && (
         <div className="relative z-10 text-center text-white">
-          {/* Bullet hole will appear where the rope is shot */}
-          {bulletHolePosition && <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />}
-          <ClickableGun onGunClick={handleGunClick} holePosition={bulletHolePosition || { x: holeTargetX, y: holeTargetY }} />
-          <Balloon
-            ref={balloonRef}
-            id="initial-balloon"
-            imageSrc="/images/image-23.png" // This will be the 23rd image
-            initialX={holeTargetX}
-            initialY={holeTargetY - 150} // Position balloon above the rope target
-            isInitialBalloon={true}
-            onFlyUpComplete={handleInitialBalloonFlyUpComplete}
-          />
+          {currentPhase === 'initialShoot' && (
+            <Button
+              onClick={handleShootNow}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 animate-fade-in-down"
+            >
+              Shoot Now <Target className="ml-2" />
+            </Button>
+          )}
+
+          {currentPhase === 'gunActive' && bulletHolePosition && (
+            <>
+              {/* Bullet hole will appear where the rope is shot */}
+              <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />
+              <ClickableGun onGunClick={handleGunClick} holePosition={bulletHolePosition} />
+              <Balloon
+                ref={balloonRef}
+                id="initial-balloon"
+                imageSrc="/images/image-23.png" // This will be the 23rd image
+                initialX={holeTargetX}
+                initialY={holeTargetY - 150} // Position balloon above the rope target
+                isInitialBalloon={true}
+                onFlyUpComplete={handleInitialBalloonFlyUpComplete}
+              />
+            </>
+          )}
         </div>
       )}
     </div>

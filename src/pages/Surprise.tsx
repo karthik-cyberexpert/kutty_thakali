@@ -11,70 +11,60 @@ import GiftBurst from "@/components/GiftBurst";
 import Bomb from "@/components/Bomb";
 import CountdownTimer from "@/components/CountdownTimer";
 import Mail from "@/components/Mail";
-import RocketAnimation from "@/components/RocketAnimation";
 
 type AnimationPhase = "gift" | "bombThrown" | "timerCountdown" | "explosion" | "finalMessage";
 
 const Surprise = () => {
   const { name } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); // To read state from navigation
 
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("gift");
   const [bombPosition, setBombPosition] = useState<{ x: number; y: number } | null>(null);
   const [explosionOrigin, setExplosionOrigin] = useState<{ x: number; y: number } | null>(null);
   const [isGiftBurstFading, setIsGiftBurstFading] = useState(false);
-  const [showFindMailText, setShowFindMailText] = useState(false);
+  const [showFindMailText, setShowFindMailText] = useState(false); // New state for "Find a mail box" text
 
-  const [isMessageBlurred, setIsMessageBlurred] = useState(true); // Reintroduced state for message blur
-  const [showRocketRevealAnimation, setShowRocketRevealAnimation] = useState(false);
-  const [showRocketText, setShowRocketText] = useState(false);
-
-  // States for button visibility
-  const [showRevealButton, setShowRevealButton] = useState(false); // Controls "Reveal Text" button
-  const [showRocketTriggerButton, setShowRocketTriggerButton] = useState(false); // Controls "Show Surprise" button
-  const [showReplayButton, setShowReplayButton] = useState(false); // Controls "Replay" button
-
+  const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
-  const revealButtonRef = useRef<HTMLButtonElement>(null); // Ref for "Reveal Text" button
-  const rocketTriggerButtonRef = useRef<HTMLButtonElement>(null); // Ref for "Show Surprise" button
   const replayButtonRef = useRef<HTMLButtonElement>(null);
+  const revealButtonRef = useRef<HTMLButtonElement>(null);
   const mainContentRef = useRef<HTMLDivElement>(null);
-  const findMailTextRef = useRef<HTMLDivElement>(null);
-
-  const numberRef = useRef<HTMLDivElement>(null);
-  const greetingRef = useRef<HTMLDivElement>(null);
+  const findMailTextRef = useRef<HTMLDivElement>(null); // Ref for the new text
 
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
 
+  // Effect to handle navigation state for final message
   useEffect(() => {
     if (location.state?.phase === 'finalMessage') {
       setAnimationPhase('finalMessage');
+      // Clear any previous states that might interfere
       setBombPosition(null);
       setExplosionOrigin(null);
       setIsGiftBurstFading(false);
-      setShowFindMailText(false);
-      setIsMessageBlurred(true); // Ensure message starts blurred
-      setShowRocketRevealAnimation(false);
-      setShowRocketText(false);
-      setShowRevealButton(true); // Show "Reveal Text" button initially
-      setShowRocketTriggerButton(false); // Hide "Show Surprise" button
-      setShowReplayButton(false); // Hide "Replay" button
+      setShowFindMailText(false); // Ensure this is false
     }
   }, [location.state]);
 
   useEffect(() => {
     if (animationPhase === "finalMessage") {
+      const gift = finalGiftRef.current;
+      const message = messageRef.current;
       const revealButton = revealButtonRef.current;
+      const replayButton = replayButtonRef.current;
 
-      if (!revealButton) return;
+      if (!gift || !message || !revealButton || !replayButton) return;
 
-      // Initial states for buttons in finalMessage phase
-      gsap.set(revealButton, { opacity: 0, y: 20 });
+      gsap.set(revealButton, { opacity: 0, y: 20, pointerEvents: 'none' });
+      gsap.set(replayButton, { opacity: 0, y: 20, pointerEvents: 'none' });
+      gsap.set(message, { filter: 'blur(16px)' });
 
-      // Animate to show the "Reveal Text" button directly
+      const letters = message.querySelectorAll('span');
       gsap.timeline()
-        .to(revealButton, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, "+=0.5");
+        .fromTo(gift, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 1, ease: 'bounce.out' })
+        .to(gift, { scale: 1.5, opacity: 0, duration: 0.5, ease: 'power2.in' })
+        .fromTo(letters, { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.05, duration: 0.5, ease: 'power2.out' }, "-=0.2")
+        .to(revealButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' }, "+=0.5");
     }
   }, [animationPhase]);
 
@@ -89,100 +79,74 @@ const Surprise = () => {
   }, []);
 
   const handleTimerComplete = useCallback(() => {
-    setAnimationPhase("explosion");
-    setShowFindMailText(true);
+    setAnimationPhase("explosion"); // Transition to explosion phase where particles and mail appear
+    setShowFindMailText(true); // Show "Find a mail box" text
   }, []);
 
   const handleMailClick = useCallback(() => {
-    setIsGiftBurstFading(true);
-    setShowFindMailText(false);
+    // This is called when the Mail icon is clicked
+    setIsGiftBurstFading(true); // Trigger GiftBurst particles to fade out
+    setShowFindMailText(false); // Hide "Find a mail box" text
+    // The Mail component's own animation will handle its disappearance
   }, []);
 
   const handleMailOpenComplete = useCallback(() => {
-    navigate(`/mail-content/${name}`, { state: { fromMailOpen: true } });
+    // This is called after the Mail opening animation finishes
+    // We now wait for GiftBurst to fade out before navigating
+    // The navigation is handled by handleGiftBurstFadeOutComplete
+    navigate(`/mail-content/${name}`, { state: { fromMailOpen: true } }); // Navigate to MailContent with state
   }, [name, navigate]);
 
   const handleGiftBurstFadeOutComplete = useCallback(() => {
-    setIsGiftBurstFading(false);
-    setShowFindMailText(false);
-  }, []);
-
-  const handleRevealText = useCallback(() => {
-    const revealButton = revealButtonRef.current;
-    const rocketTriggerButton = rocketTriggerButtonRef.current;
-
-    if (!revealButton || !rocketTriggerButton) return;
-
-    // Unblur the message instantly by updating state
-    setIsMessageBlurred(false);
-
-    gsap.timeline()
-      .to(revealButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in', onComplete: () => {
-          setShowRevealButton(false); // Hide the "Reveal Text" button
-      }})
-      .call(() => {
-          // Re-blur the message after 6 seconds
-          setTimeout(() => {
-              setIsMessageBlurred(true); // Re-blur instantly
-              // Show the "Show Surprise" button
-              gsap.fromTo(rocketTriggerButton,
-                  { opacity: 0, y: 20 },
-                  { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out', onStart: () => {
-                      setShowRocketTriggerButton(true);
-                  }}
-              );
-          }, 6000); // 6 seconds delay
-      }, [], 0); // Start this call immediately with the button fade out
-
-  }, []);
-
-  const handleTriggerRocket = useCallback(() => {
-    const rocketTriggerButton = rocketTriggerButtonRef.current;
-    if (!rocketTriggerButton) return;
-
-    gsap.to(rocketTriggerButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in', onComplete: () => {
-        setShowRocketTriggerButton(false); // Hide the "Show Surprise" button
-    }});
-    setShowRocketRevealAnimation(true); // Start the rocket animation
-  }, []);
-
-  const handleRocketRevealText = useCallback(() => {
-    setShowRocketText(true);
-    gsap.timeline()
-      .fromTo(numberRef.current,
-        { opacity: 0, y: 50, scale: 0.8, filter: 'blur(10px)' },
-        { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }
-      )
-      .fromTo(greetingRef.current,
-        { opacity: 0, y: 50, scale: 0.8, filter: 'blur(10px)' },
-        { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' },
-        '-=0.4'
-      );
-  }, []);
-
-  const handleRocketAnimationComplete = useCallback(() => {
-    setShowRocketRevealAnimation(false);
-    setShowReplayButton(true); // Show replay button after rocket animation
-    const replayButton = replayButtonRef.current;
-    if (replayButton) {
-      gsap.fromTo(replayButton, { opacity: 0, y: 20 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' });
-    }
+    // This callback is fired when GiftBurst particles have completely faded out
+    // This navigation is now handled by handleMailOpenComplete
+    setIsGiftBurstFading(false); // Reset state for replay
+    setShowFindMailText(false); // Ensure this is false
   }, []);
 
   const handleReplay = useCallback(() => {
     setAnimationPhase('gift');
     setBombPosition(null);
     setExplosionOrigin(null);
-    setIsGiftBurstFading(false);
-    setShowFindMailText(false);
-    setIsMessageBlurred(true); // Reset for replay
-    setShowRocketRevealAnimation(false);
-    setShowRocketText(false);
-    setShowRevealButton(true); // Reset for replay
-    setShowRocketTriggerButton(false); // Reset for replay
-    setShowReplayButton(false); // Reset for replay
+    setIsGiftBurstFading(false); // Reset state
+    setShowFindMailText(false); // Reset state
     if (mainContentRef.current) {
         gsap.set(mainContentRef.current, { opacity: 1, display: 'flex' });
+    }
+  }, []);
+
+  const handleReveal = useCallback(() => {
+    const message = messageRef.current;
+    const revealButton = revealButtonRef.current;
+    const replayButton = replayButtonRef.current;
+
+    if (message && revealButton && replayButton) {
+      const gradientClasses = ['bg-clip-text', 'text-transparent', 'bg-gradient-to-r', 'from-pink-400', 'via-purple-400', 'to-cyan-400'];
+
+      const tl = gsap.timeline();
+      tl.to(revealButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in' })
+        .to(message, {
+          filter: 'blur(0px)',
+          duration: 1.5,
+          ease: 'power2.out',
+          onStart: () => {
+            message.classList.remove(...gradientClasses);
+            message.classList.add('text-cyan-300');
+            message.style.textShadow = '0 0 15px rgba(0, 255, 255, 0.7)';
+          }
+        }, 0)
+        .to(message, {
+          filter: 'blur(16px)',
+          duration: 1.5,
+          ease: 'power2.inOut',
+          delay: 9.5,
+          onStart: () => {
+            message.classList.add(...gradientClasses);
+            message.classList.remove('text-cyan-300');
+            message.style.textShadow = '0 0 10px rgba(255,255,255,0.5)';
+          }
+        })
+        .to(replayButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' });
     }
   }, []);
 
@@ -217,18 +181,18 @@ const Surprise = () => {
           <GiftBurst
             originX={explosionOrigin.x}
             originY={explosionOrigin.y}
-            fadeAway={isGiftBurstFading}
-            onFadeOutComplete={handleGiftBurstFadeOutComplete}
+            fadeAway={isGiftBurstFading} // Control fade out via state
+            onFadeOutComplete={handleGiftBurstFadeOutComplete} // Callback when fade out is done
           />
           <Mail
-            explosionOrigin={explosionOrigin}
+            explosionOrigin={explosionOrigin} // Pass origin for scattering
             onMailClick={handleMailClick}
             onMailOpenComplete={handleMailOpenComplete}
           />
           {showFindMailText && (
             <div
               ref={findMailTextRef}
-              className="absolute inset-x-0 top-0 flex items-start justify-center z-40 text-white text-4xl md:text-5xl font-bold animate-fade-in-down pt-20"
+              className="absolute inset-0 flex items-center justify-center z-40 text-white text-4xl md:text-5xl font-bold animate-fade-in-down"
               style={{ textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(0,255,255,0.7)' }}
             >
               Find a mail box!
@@ -240,56 +204,23 @@ const Surprise = () => {
       {/* Phase: Final Message */}
       {animationPhase === "finalMessage" && (
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
-          {/* Confetti (appears when gift is hidden) */}
-          <Confetti />
-
-          {/* Original blurred message (visible until "Reveal Text" is clicked) */}
+          <div ref={finalGiftRef} className="text-8xl">🎁</div>
+          {finalGiftRef.current && gsap.getProperty(finalGiftRef.current, "opacity") === 0 && <Confetti />}
           <div
             ref={messageRef}
-            className={`font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 ${isMessageBlurred ? 'blur-lg' : ''}`}
+            className="font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400"
             style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
           >
-            {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block">{char === ' ' ? '\u00A0' : char}</span>)}
+            {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>)}
           </div>
-
-          {/* "Reveal Text" button */}
-          {showRevealButton && (
-            <Button ref={revealButtonRef} onClick={handleRevealText} className="mt-8 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
-              <Eye className="mr-2 h-4 w-4" /> Reveal Text
+          <div className="mt-8 h-12 relative min-w-[240px]">
+            <Button ref={revealButtonRef} onClick={handleReveal} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
+              <Eye className="mr-2 h-4 w-4" /> Reveal Message
             </Button>
-          )}
-
-          {/* "Show Surprise" button (for rocket animation) */}
-          {showRocketTriggerButton && (
-            <Button ref={rocketTriggerButtonRef} onClick={handleTriggerRocket} className="mt-8 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
-              <Eye className="mr-2 h-4 w-4" /> Show Surprise
+            <Button ref={replayButtonRef} onClick={handleReplay} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
+              <RefreshCw className="mr-2 h-4 w-4" /> Replay
             </Button>
-          )}
-
-          {/* Rocket animation component */}
-          {showRocketRevealAnimation && (
-            <RocketAnimation
-              onReveal={handleRocketRevealText}
-              onComplete={handleRocketAnimationComplete}
-            />
-          )}
-
-          {/* Revealed text and Replay button */}
-          {showRocketText && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-50">
-              <div ref={numberRef} className="text-9xl md:text-[12rem] font-bold text-white mb-4" style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,0,255,0.8)' }}>
-                19
-              </div>
-              <div ref={greetingRef} className="text-3xl md:text-4xl font-script text-purple-300 mb-8" style={{ textShadow: '0 0 10px rgba(128,0,128,0.7)' }}>
-                Happy Birthday Bestoo
-              </div>
-              {showReplayButton && (
-                <Button ref={replayButtonRef} onClick={handleReplay} className="mt-8 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
-                  <RefreshCw className="mr-2 h-4 w-4" /> Replay
-                </Button>
-              )}
-            </div>
-          )}
+          </div>
         </div>
       )}
     </div>

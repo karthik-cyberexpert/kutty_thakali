@@ -3,7 +3,7 @@ import { gsap } from 'gsap';
 import { Mail as MailIcon } from 'lucide-react'; // Import Mail icon
 
 interface MailProps {
-  explosionOrigin: { x: number; y: number }; // Where the explosion happened (used for initial set, but then moves to center)
+  explosionOrigin: { x: number; y: number }; // Where the explosion happened
   onMailClick: () => void; // Callback when mail icon is clicked
   onMailOpenComplete: () => void; // Callback for when mail opening animation finishes
 }
@@ -15,11 +15,17 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     const mail = mailRef.current;
     if (!mail) return;
 
-    // Calculate the center of the screen
-    const screenCenterX = window.innerWidth / 2;
-    const screenCenterY = window.innerHeight / 2;
+    // Define a central area for the mail icon to scatter to (e.g., central 40% of the screen)
+    const centralAreaPercentage = 0.4;
+    const minX = window.innerWidth * (0.5 - centralAreaPercentage / 2);
+    const maxX = window.innerWidth * (0.5 + centralAreaPercentage / 2);
+    const minY = window.innerHeight * (0.5 - centralAreaPercentage / 2);
+    const maxY = window.innerHeight * (0.5 + centralAreaPercentage / 2);
 
-    // Set initial position to the explosion origin, then animate to the center
+    // Initial random position for the mail icon, scattering from the explosion origin
+    const randomX = gsap.utils.random(minX, maxX);
+    const randomY = gsap.utils.random(minY, maxY);
+
     gsap.set(mail, {
       x: explosionOrigin.x,
       y: explosionOrigin.y,
@@ -30,16 +36,29 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
       rotation: gsap.utils.random(0, 360),
     });
 
-    // Animate the mail icon to the center of the screen
+    const scatterDuration = 1.2;
+    const scatterDelay = gsap.utils.random(0, 0.5);
+
     gsap.to(mail, {
-      x: screenCenterX,
-      y: screenCenterY,
+      x: randomX,
+      y: randomY,
       scale: 1,
       opacity: 1,
-      rotation: 0, // Stop rotation
-      duration: 0.8,
-      ease: 'back.out(1.7)',
-      delay: 0.2, // Small delay after explosion
+      rotation: gsap.utils.random(-20, 20),
+      duration: scatterDuration,
+      ease: 'power3.out',
+      delay: scatterDelay,
+      onComplete: () => {
+        // After scattering, start a continuous floating animation
+        gsap.to(mail, {
+          y: '+=15', // Move up and down by 15px
+          rotation: '+=5', // Subtle continuous rotation
+          duration: 2,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1, // Infinite repeat
+        });
+      }
     });
 
   }, [explosionOrigin]);
@@ -67,10 +86,10 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     <div
       ref={mailRef}
       onClick={handleClick}
-      className="absolute z-50 cursor-pointer text-white"
+      className="absolute z-50 cursor-pointer text-white" // Removed flex classes
       style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(0,255,255,0.8)' }}
     >
-      <MailIcon size={100} />
+      <MailIcon size={100} /> {/* Use MailIcon with a specific size */}
     </div>
   );
 };
