@@ -14,12 +14,12 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     const mail = mailRef.current;
     if (!mail) return;
 
-    // Define a central area for the mail icon to scatter to
-    const padding = 0.2; // 20% padding from edges
-    const minX = window.innerWidth * padding;
-    const maxX = window.innerWidth * (1 - padding);
-    const minY = window.innerHeight * padding;
-    const maxY = window.innerHeight * (1 - padding);
+    // Define a central area for the mail icon to scatter to (e.g., central 40% of the screen)
+    const centralAreaPercentage = 0.4; 
+    const minX = window.innerWidth * (0.5 - centralAreaPercentage / 2);
+    const maxX = window.innerWidth * (0.5 + centralAreaPercentage / 2);
+    const minY = window.innerHeight * (0.5 - centralAreaPercentage / 2);
+    const maxY = window.innerHeight * (0.5 + centralAreaPercentage / 2);
 
     // Initial random position for the mail icon, scattering from the explosion origin
     const randomX = gsap.utils.random(minX, maxX);
