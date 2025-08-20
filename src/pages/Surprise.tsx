@@ -30,6 +30,7 @@ const Surprise = () => {
   const [showOriginalBirthdayMessage, setShowOriginalBirthdayMessage] = useState(true);
   const [showRocketRevealAnimation, setShowRocketRevealAnimation] = useState(false);
   const [showRocketText, setShowRocketText] = useState(false);
+  const [showFinalGiftBox, setShowFinalGiftBox] = useState(true); // New state to control gift box visibility
 
   const finalGiftRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null); // Ref for the original birthday message
@@ -56,6 +57,7 @@ const Surprise = () => {
       setShowOriginalBirthdayMessage(true); // Start with original blurred message
       setShowRocketRevealAnimation(false);
       setShowRocketText(false);
+      setShowFinalGiftBox(true); // Ensure gift box is visible when entering this phase
     }
   }, [location.state]);
 
@@ -80,7 +82,7 @@ const Surprise = () => {
           duration: 0.5,
           ease: 'power2.in',
           onComplete: () => {
-            gsap.set(gift, { display: 'none' }); // Hide it completely after fading out
+            setShowFinalGiftBox(false); // Hide it completely after fading out
           }
         })
         .to(revealButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' }, "+=0.5");
@@ -163,6 +165,7 @@ const Surprise = () => {
     setShowOriginalBirthdayMessage(true); // Show original blurred message again
     setShowRocketRevealAnimation(false); // Hide rocket animation
     setShowRocketText(false); // Hide rocket text
+    setShowFinalGiftBox(true); // Show gift box again for replay
     if (mainContentRef.current) {
         gsap.set(mainContentRef.current, { opacity: 1, display: 'flex' });
     }
@@ -222,10 +225,12 @@ const Surprise = () => {
       {/* Phase: Final Message */}
       {animationPhase === "finalMessage" && (
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
-          {/* Gift box (will be hidden by GSAP) */}
-          <div ref={finalGiftRef} className="text-8xl">🎁</div>
+          {/* Gift box (conditionally rendered) */}
+          {showFinalGiftBox && (
+            <div ref={finalGiftRef} className="text-8xl">🎁</div>
+          )}
           {/* Confetti (appears when gift is hidden) */}
-          {finalGiftRef.current && gsap.getProperty(finalGiftRef.current, "opacity") === 0 && <Confetti />}
+          {!showFinalGiftBox && <Confetti />}
 
           {/* Original blurred message (visible until "Show" is clicked) */}
           {showOriginalBirthdayMessage && (
@@ -240,11 +245,9 @@ const Surprise = () => {
 
           {/* "Show" button (visible only before rocket animation) */}
           {!showRocketRevealAnimation && !showRocketText && (
-            <div className="mt-8 h-12 relative min-w-[240px]">
-              <Button ref={revealButtonRef} onClick={handleShow} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
-                <Eye className="mr-2 h-4 w-4" /> Show
-              </Button>
-            </div>
+            <Button ref={revealButtonRef} onClick={handleShow} className="mt-8 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
+              <Eye className="mr-2 h-4 w-4" /> Show
+            </Button>
           )}
 
           {/* Rocket animation component */}
@@ -264,11 +267,9 @@ const Surprise = () => {
               <div ref={greetingRef} className="text-3xl md:text-4xl font-script text-purple-300 mb-8" style={{ textShadow: '0 0 10px rgba(128,0,128,0.7)' }}>
                 Happy Birthday Bestoo
               </div>
-              <div className="h-12 relative min-w-[240px]">
-                <Button ref={replayButtonRef} onClick={handleReplay} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
-                  <RefreshCw className="mr-2 h-4 w-4" /> Replay
-                </Button>
-              </div>
+              <Button ref={replayButtonRef} onClick={handleReplay} className="mt-8 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
+                <RefreshCw className="mr-2 h-4 w-4" /> Replay
+              </Button>
             </div>
           )}
         </div>
