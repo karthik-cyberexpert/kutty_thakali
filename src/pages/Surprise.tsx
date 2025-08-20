@@ -128,15 +128,23 @@ const Surprise = () => {
 
     if (!revealButton || !message || !rocketTriggerButton) return;
 
-    gsap.to(revealButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in', onComplete: () => {
-        setShowRevealButton(false); // Hide the "Reveal Text" button
-        setIsMessageBlurred(false); // Unblur the message
-        gsap.to(message, { filter: 'blur(0px)', duration: 1.5, ease: 'power2.out' }); // Animate unblur
-        
-        // After unblur, show the "Show Surprise" button
-        gsap.fromTo(rocketTriggerButton, { opacity: 0, y: 20 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out', delay: 0.5 });
-        setShowRocketTriggerButton(true); // Make sure it's rendered
-    }});
+    gsap.timeline()
+      .to(revealButton, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.5, ease: 'power2.in', onComplete: () => {
+          setShowRevealButton(false); // Hide the "Reveal Text" button
+      }})
+      .to(message, { filter: 'blur(0px)', duration: 1.5, ease: 'power2.out', onComplete: () => {
+          setIsMessageBlurred(false); // Unblur the message
+      }}, 0) // Start unblur immediately with button fade
+      .to(message, { filter: 'blur(10px)', duration: 1.5, ease: 'power2.in', delay: 6, onComplete: () => {
+          setIsMessageBlurred(true); // Re-blur the message
+      }})
+      .fromTo(rocketTriggerButton,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out', onStart: () => {
+            setShowRocketTriggerButton(true); // Make sure it's rendered
+        }},
+        "<" // Start at the same time as message re-blur
+      );
   }, []);
 
   const handleTriggerRocket = useCallback(() => {
