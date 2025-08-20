@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Welcome from "./pages/Welcome";
 import Surprise from "./pages/Surprise";
-import MailContent from "./pages/MailContent"; // Import new page
+import MailContent from "./pages/MailContent";
+import BalloonsGridPage from "./pages/BalloonsGridPage"; // Import new page
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,7 +20,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Welcome />} />
           <Route path="/surprise/:name" element={<Surprise />} />
-          <Route path="/mail-content/:name" element={<MailContent />} /> {/* New route */}
+          <Route path="/mail-content/:name" element={<MailContent />} />
+          <Route path="/balloons-grid/:name" element={<BalloonsGridPage />} /> {/* New route */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,10 +1,9 @@
 import React, { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
-// Removed import for Target icon
 
 interface ClickableGunProps {
   onGunClick: () => void;
-  holePosition: { x: number; y: number };
+  holePosition: { x: number; y: number }; // Now represents the target for the bullet (balloon rope)
 }
 
 const ClickableGun: React.FC<ClickableGunProps> = ({ onGunClick, holePosition }) => {
@@ -49,7 +48,7 @@ const ClickableGun: React.FC<ClickableGunProps> = ({ onGunClick, holePosition })
     });
 
     tl.to(bullet, {
-      x: holePosition.x,
+      x: holePosition.x, // Target the balloon's rope position
       y: holePosition.y,
       scale: 1,
       opacity: 0,
@@ -60,7 +59,7 @@ const ClickableGun: React.FC<ClickableGunProps> = ({ onGunClick, holePosition })
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center"> {/* Changed justify-start to justify-center */}
+    <div className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center">
       <div ref={gunRef} onClick={handleClick} className="relative text-white cursor-pointer pointer-events-auto">
         {/* Pistol SVG */}
         <svg

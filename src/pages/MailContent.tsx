@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import ParticlesBackground from '@/components/ParticlesBackground';
@@ -7,7 +7,7 @@ import MailboxAndLetter from '@/components/MailboxAndLetter';
 import { Target } from 'lucide-react';
 import { gsap } from 'gsap';
 import ClickableGun from '@/components/ClickableGun';
-import ShotImage from '@/components/ShotImage';
+import Balloon from '@/components/Balloon'; // Import the new Balloon component
 
 type MailContentPhase = 'mailbox' | 'initialShoot' | 'gunActive';
 
@@ -19,17 +19,15 @@ const MailContent = () => {
   const [currentPhase, setCurrentPhase] = useState<MailContentPhase>(
     location.state?.fromMailOpen ? 'mailbox' : 'initialShoot'
   );
-  const [currentShotIndex, setCurrentShotIndex] = useState(0); // Tracks how many images have been shot
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
-
-  // Adjusted to load all 24 images
-  const images = Array.from({ length: 24 }, (_, i) => `/images/image-${i + 1}.png`);
-
-  // Define the static target position for the bullet hole (center-right of the screen)
-  const holeTargetX = window.innerWidth * 0.75;
-  const holeTargetY = window.innerHeight * 0.5;
+  const balloonRef = useRef<{ cutRopeAndFly: () => void }>(null); // Ref to call method on Balloon
 
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
+
+  // Define the static target position for the bullet hole (center-right of the screen)
+  // This will be where the balloon's rope is
+  const holeTargetX = window.innerWidth * 0.75;
+  const holeTargetY = window.innerHeight * 0.5;
 
   const handleMailboxClose = useCallback(() => {
     setCurrentPhase('initialShoot');
@@ -42,24 +40,17 @@ const MailContent = () => {
   }, [holeTargetX, holeTargetY]);
 
   const handleGunClick = useCallback(() => {
-    if (currentShotIndex < images.length) {
-      setCurrentShotIndex(prevIndex => prevIndex + 1);
+    if (balloonRef.current) {
+      balloonRef.current.cutRopeAndFly(); // Trigger the balloon's animation
     }
-  }, [currentShotIndex, images.length]);
+  }, []);
 
-  // Effect to check if all images have been shot
-  useEffect(() => {
-    if (currentShotIndex === images.length && currentShotIndex > 0) {
-      // All images shot, now transition to final message
-      // Add a small delay to let the last image settle
-      const timer = setTimeout(() => {
-        navigate(`/surprise/${name}`, { state: { phase: 'finalMessage' } });
-      }, 1500); // Adjust delay as needed
-      return () => clearTimeout(timer);
-    }
-  }, [currentShotIndex, images.length, name, navigate]);
+  const handleInitialBalloonFlyUpComplete = useCallback(() => {
+    // Once the first balloon flies up, navigate to the new BalloonsGridPage
+    navigate(`/balloons-grid/${name}`, { state: { flyingBalloonIndex: 22 } }); // Pass index for the 23rd balloon (0-indexed)
+  }, [name, navigate]);
 
-  // Effect for initial page content animation (already exists)
+  // Effect for initial page content animation
   useEffect(() => {
     if (currentPhase === 'initialShoot' || currentPhase === 'gunActive') {
       gsap.fromTo(".mail-content-container",
@@ -90,17 +81,18 @@ const MailContent = () => {
 
           {currentPhase === 'gunActive' && bulletHolePosition && (
             <>
+              {/* Bullet hole will appear where the rope is shot */}
               <BulletHole x={bulletHolePosition.x} y={bulletHolePosition.y} />
               <ClickableGun onGunClick={handleGunClick} holePosition={bulletHolePosition} />
-              {/* Render previously shot images */}
-              {Array.from({ length: currentShotIndex }).map((_, index) => (
-                <ShotImage
-                  key={index}
-                  src={images[index]}
-                  holePosition={bulletHolePosition}
-                  index={index} // Pass index to stagger animation
-                />
-              ))}
+              <Balloon
+                ref={balloonRef}
+                id="initial-balloon"
+                imageSrc="/images/image-23.png" // This will be the 23rd image
+                initialX={holeTargetX}
+                initialY={holeTargetY - 150} // Position balloon above the rope target
+                isInitialBalloon={true}
+                onFlyUpComplete={handleInitialBalloonFlyUpComplete}
+              />
             </>
           )}
         </div>
