@@ -25,7 +25,7 @@ const BalloonsGridPage = () => {
   }));
 
   const [balloons, setBalloons] = useState<BalloonData[]>(initialBalloons);
-  const [showReplayButton, setShowReplayButton] = useState(false);
+  const [allBalloonsBurst, setAllBalloonsBurst] = useState(false); // New state to track if all are burst
 
   // Effect to handle the arrival of the 23rd balloon
   useEffect(() => {
@@ -52,15 +52,22 @@ const BalloonsGridPage = () => {
       );
       // Check if all balloons are burst
       if (updatedBalloons.every(b => b.isBurst)) {
-        setShowReplayButton(true);
+        setAllBalloonsBurst(true); // Set state to true when all are burst
       }
       return updatedBalloons;
     });
   }, []);
 
-  const handleReplay = useCallback(() => {
-    navigate(`/surprise/${name}`, { state: { phase: 'finalMessage' } });
-  }, [name, navigate]);
+  // Effect to handle automatic navigation after all balloons are burst
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (allBalloonsBurst) {
+      timer = setTimeout(() => {
+        navigate(`/surprise/${name}`, { state: { phase: 'finalMessage' } });
+      }, 3000); // 3-second delay
+    }
+    return () => clearTimeout(timer); // Clean up the timer
+  }, [allBalloonsBurst, name, navigate]);
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden p-4">
@@ -81,16 +88,7 @@ const BalloonsGridPage = () => {
             />
           ))}
         </div>
-        {showReplayButton && (
-          <div className="mt-12 animate-fade-in-down">
-            <Button
-              onClick={handleReplay}
-              className="bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300 py-3 px-6 text-lg rounded-full"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" /> See Final Message
-            </Button>
-          </div>
-        )}
+        {/* The "See Final Message" button is removed */}
       </div>
     </div>
   );
