@@ -113,7 +113,7 @@ const Surprise = () => {
 
     if (!revealButton || !rocketTriggerButton) return;
 
-    // Unblur the message
+    // Unblur the message instantly by updating state
     setIsMessageBlurred(false);
 
     gsap.timeline()
@@ -123,7 +123,7 @@ const Surprise = () => {
       .call(() => {
           // Re-blur the message after 6 seconds
           setTimeout(() => {
-              setIsMessageBlurred(true);
+              setIsMessageBlurred(true); // Re-blur instantly
               // Show the "Show Surprise" button
               gsap.fromTo(rocketTriggerButton,
                   { opacity: 0, y: 20 },
