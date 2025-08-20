@@ -192,7 +192,7 @@ const Surprise = () => {
           {showFindMailText && (
             <div
               ref={findMailTextRef}
-              className="absolute inset-0 flex items-center justify-center z-40 text-white text-4xl md:text-5xl font-bold animate-fade-in-down"
+              className="absolute inset-0 flex flex-col items-center justify-start pt-20 z-40 text-white text-4xl md:text-5xl font-bold animate-fade-in-down"
               style={{ textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(0,255,255,0.7)' }}
             >
               Find a mail box!
