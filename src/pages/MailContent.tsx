@@ -6,10 +6,10 @@ import BulletHole from '@/components/BulletHole';
 import MailboxAndLetter from '@/components/MailboxAndLetter';
 import { Target } from 'lucide-react';
 import { gsap } from 'gsap';
-import ClickableGun from '@/components/ClickableGun'; // New import
-import ShotImage from '@/components/ShotImage'; // New import
+import ClickableGun from '@/components/ClickableGun';
+import ShotImage from '@/components/ShotImage';
 
-type MailContentPhase = 'mailbox' | 'initialShoot' | 'gunActive'; // Simplified phases
+type MailContentPhase = 'mailbox' | 'initialShoot' | 'gunActive';
 
 const MailContent = () => {
   const { name } = useParams();
@@ -22,7 +22,8 @@ const MailContent = () => {
   const [currentShotIndex, setCurrentShotIndex] = useState(0); // Tracks how many images have been shot
   const [bulletHolePosition, setBulletHolePosition] = useState<{ x: number; y: number } | null>(null);
 
-  const images = Array.from({ length: 23 }, (_, i) => `/images/image-${i + 1}.png`);
+  // Adjusted to load all 24 images
+  const images = Array.from({ length: 24 }, (_, i) => `/images/image-${i + 1}.png`);
 
   // Define the static target position for the bullet hole (center-right of the screen)
   const holeTargetX = window.innerWidth * 0.75;
