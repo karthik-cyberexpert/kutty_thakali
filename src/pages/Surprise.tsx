@@ -68,17 +68,18 @@ const Surprise = () => {
 
   useEffect(() => {
     if (animationPhase === "finalMessage") {
-      // const gift = finalGiftRef.current; // Removed this
       const revealButton = revealButtonRef.current;
 
-      if (!revealButton) return; // Only check for revealButton now
+      if (!revealButton) return;
 
       // Initial states for buttons in finalMessage phase
-      gsap.set(revealButton, { opacity: 0, y: 20, pointerEvents: 'none' });
+      // Removed pointerEvents: 'none' from here to ensure it's clickable
+      gsap.set(revealButton, { opacity: 0, y: 20 });
 
       // Animate to show the "Reveal Text" button directly
       gsap.timeline()
-        .to(revealButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' }, "+=0.5");
+        .to(revealButton, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, "+=0.5");
+        // Removed pointerEvents: 'auto' from here, as it's default for buttons
     }
   }, [animationPhase]);
 
