@@ -11,7 +11,7 @@ import GiftBurst from "@/components/GiftBurst";
 import Bomb from "@/components/Bomb";
 import CountdownTimer from "@/components/CountdownTimer";
 import Mail from "@/components/Mail";
-import RocketAnimation from "@/components/RocketAnimation"; // Import the new component
+import RocketAnimation from "@/components/RocketAnimation";
 
 type AnimationPhase = "gift" | "bombThrown" | "timerCountdown" | "explosion" | "finalMessage";
 
@@ -37,6 +37,10 @@ const Surprise = () => {
   const replayButtonRef = useRef<HTMLButtonElement>(null);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const findMailTextRef = useRef<HTMLDivElement>(null); // Ref for the new text
+
+  // Refs for the new animated text elements
+  const numberRef = useRef<HTMLDivElement>(null);
+  const greetingRef = useRef<HTMLDivElement>(null);
 
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
 
@@ -121,8 +125,17 @@ const Surprise = () => {
   }, []);
 
   const handleRocketRevealText = useCallback(() => {
-    setShowRocketText(true); // Make the "19 Happy Birthday Bestoo" text visible
-    // Optional: Add a GSAP animation for the text appearance here if desired
+    setShowRocketText(true); // Render the elements first
+    gsap.timeline()
+      .fromTo(numberRef.current,
+        { opacity: 0, y: 50, scale: 0.8, filter: 'blur(10px)' },
+        { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }
+      )
+      .fromTo(greetingRef.current,
+        { opacity: 0, y: 50, scale: 0.8, filter: 'blur(10px)' },
+        { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' },
+        '-=0.4' // Stagger the start slightly
+      );
   }, []);
 
   const handleRocketAnimationComplete = useCallback(() => {
@@ -225,10 +238,10 @@ const Surprise = () => {
 
           {showRocketText && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-50">
-              <div className="text-9xl md:text-[12rem] font-bold text-white mb-4" style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,0,255,0.8)' }}>
+              <div ref={numberRef} className="text-9xl md:text-[12rem] font-bold text-white mb-4" style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,0,255,0.8)' }}>
                 19
               </div>
-              <div className="text-3xl md:text-4xl font-script text-purple-300" style={{ textShadow: '0 0 10px rgba(128,0,128,0.7)' }}>
+              <div ref={greetingRef} className="text-3xl md:text-4xl font-script text-purple-300" style={{ textShadow: '0 0 10px rgba(128,0,128,0.7)' }}>
                 Happy Birthday Bestoo
               </div>
             </div>
