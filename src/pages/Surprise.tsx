@@ -29,14 +29,14 @@ const Surprise = () => {
   const [isMessageBlurred, setIsMessageBlurred] = useState(true); // New state for message blur
   const [showRocketRevealAnimation, setShowRocketRevealAnimation] = useState(false);
   const [showRocketText, setShowRocketText] = useState(false);
-  const [showFinalGiftBox, setShowFinalGiftBox] = useState(true);
+  // const [showFinalGiftBox, setShowFinalGiftBox] = useState(true); // Removed this state
 
   // States for button visibility
   const [showRevealButton, setShowRevealButton] = useState(false); // Controls "Reveal Text" button
   const [showRocketTriggerButton, setShowRocketTriggerButton] = useState(false); // Controls "Show Surprise" button
   const [showReplayButton, setShowReplayButton] = useState(false); // Controls "Replay" button
 
-  const finalGiftRef = useRef<HTMLDivElement>(null);
+  // const finalGiftRef = useRef<HTMLDivElement>(null); // Removed this ref
   const messageRef = useRef<HTMLDivElement>(null);
   const revealButtonRef = useRef<HTMLButtonElement>(null); // Ref for "Reveal Text" button
   const rocketTriggerButtonRef = useRef<HTMLButtonElement>(null); // Ref for "Show Surprise" button
@@ -59,7 +59,7 @@ const Surprise = () => {
       setIsMessageBlurred(true); // Start with message blurred
       setShowRocketRevealAnimation(false);
       setShowRocketText(false);
-      setShowFinalGiftBox(true);
+      // setShowFinalGiftBox(true); // Removed this
       setShowRevealButton(true); // Show "Reveal Text" button initially
       setShowRocketTriggerButton(false); // Hide "Show Surprise" button
       setShowReplayButton(false); // Hide "Replay" button
@@ -68,26 +68,16 @@ const Surprise = () => {
 
   useEffect(() => {
     if (animationPhase === "finalMessage") {
-      const gift = finalGiftRef.current;
+      // const gift = finalGiftRef.current; // Removed this
       const revealButton = revealButtonRef.current;
 
-      if (!gift || !revealButton) return;
+      if (!revealButton) return; // Only check for revealButton now
 
       // Initial states for buttons in finalMessage phase
       gsap.set(revealButton, { opacity: 0, y: 20, pointerEvents: 'none' });
 
-      // Animate gift and then show the "Reveal Text" button
+      // Animate to show the "Reveal Text" button directly
       gsap.timeline()
-        .fromTo(gift, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 1, ease: 'bounce.out' })
-        .to(gift, {
-          scale: 1.5,
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power2.in',
-          onComplete: () => {
-            setShowFinalGiftBox(false); // Hide it completely after fading out
-          }
-        })
         .to(revealButton, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out' }, "+=0.5");
     }
   }, [animationPhase]);
@@ -189,7 +179,7 @@ const Surprise = () => {
     setIsMessageBlurred(true); // Reset for replay
     setShowRocketRevealAnimation(false);
     setShowRocketText(false);
-    setShowFinalGiftBox(true);
+    // setShowFinalGiftBox(true); // Removed this
     setShowRevealButton(true); // Reset for replay
     setShowRocketTriggerButton(false); // Reset for replay
     setShowReplayButton(false); // Reset for replay
@@ -252,12 +242,8 @@ const Surprise = () => {
       {/* Phase: Final Message */}
       {animationPhase === "finalMessage" && (
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
-          {/* Gift box (conditionally rendered) */}
-          {showFinalGiftBox && (
-            <div ref={finalGiftRef} className="text-8xl">🎁</div>
-          )}
           {/* Confetti (appears when gift is hidden) */}
-          {!showFinalGiftBox && <Confetti />}
+          <Confetti />
 
           {/* Original blurred message (visible until "Reveal Text" is clicked) */}
           <div
