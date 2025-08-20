@@ -12,6 +12,7 @@ interface BalloonProps {
   isBurst?: boolean; // For balloons in the grid, controlled by parent
   onBurst?: (id: string) => void; // Callback when a grid balloon is clicked/burst
   className?: string; // For grid positioning
+  isAutoBurstingActive?: boolean; // New prop to indicate if automatic bursting is active
 }
 
 const Balloon = forwardRef<any, BalloonProps>(({
@@ -23,7 +24,8 @@ const Balloon = forwardRef<any, BalloonProps>(({
   onFlyUpComplete,
   isBurst: propIsBurst = false,
   onBurst,
-  className
+  className,
+  isAutoBurstingActive = false // Default to false
 }, ref) => {
   const balloonRef = useRef<HTMLDivElement>(null);
   const ropeRef = useRef<HTMLDivElement>(null);
@@ -110,9 +112,10 @@ const Balloon = forwardRef<any, BalloonProps>(({
       }
     })
     .to(balloon, {
-      scale: 1.2, // Pop out slightly
+      scale: 1.3, // More pronounced pop out
       opacity: 0, // Fade out
-      duration: 0.2,
+      y: '-=20', // Move up slightly as it bursts
+      duration: 0.2, // Faster burst
       ease: 'power1.out',
       onStart: () => {
         // Optional: Add a small "pop" sound effect here
@@ -121,7 +124,9 @@ const Balloon = forwardRef<any, BalloonProps>(({
   };
 
   const handleClick = () => {
-    if (!isInitialBalloon && !internalIsBurst) {
+    // Only allow manual click if it's NOT the initial balloon (shot by gun)
+    // AND if it's not already burst AND if automatic bursting is NOT active.
+    if (!isInitialBalloon && !internalIsBurst && !isAutoBurstingActive) {
       setInternalIsBurst(true); // Set internal state to trigger burst
       burstBalloon();
     }

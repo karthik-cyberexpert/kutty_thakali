@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import ParticlesBackground from '@/components/ParticlesBackground';
 import Balloon from '@/components/Balloon'; // Import the Balloon component
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
 
 interface BalloonData {
   id: string;
@@ -24,24 +22,19 @@ const BalloonsGridPage = () => {
     isBurst: false,
   }));
 
+  const balloonRefs = useRef<(any | null)[]>([]); // Array to hold refs for each balloon
   const [balloons, setBalloons] = useState<BalloonData[]>(initialBalloons);
   const [allBalloonsBurst, setAllBalloonsBurst] = useState(false); // New state to track if all are burst
+  const [currentBurstIndex, setCurrentBurstIndex] = useState(0); // Start at 0 to burst the first balloon immediately
 
-  // Effect to handle the arrival of the 23rd balloon
+  // Effect to handle the arrival of the 23rd balloon (if coming from MailContent)
   useEffect(() => {
     const flyingBalloonIndex = location.state?.flyingBalloonIndex; // Should be 22 (for 23rd balloon)
     if (typeof flyingBalloonIndex === 'number' && flyingBalloonIndex >= 0 && flyingBalloonIndex < balloons.length) {
-      // Temporarily hide the 23rd balloon in the grid until it animates in
-      const updatedBalloons = balloons.map((b, idx) =>
+      // Ensure the 23rd balloon is not marked as burst initially if it just flew in
+      setBalloons(prevBalloons => prevBalloons.map((b, idx) =>
         idx === flyingBalloonIndex ? { ...b, isBurst: false } : b
-      );
-      setBalloons(updatedBalloons);
-
-      // Animate the 23rd balloon into its grid position
-      // This requires the Balloon component to be rendered first, then animated
-      // We'll rely on the Balloon component's internal animation for its initial appearance
-      // and then potentially a separate GSAP timeline here if needed for specific grid placement.
-      // For now, the Balloon component's default fade-in will suffice.
+      ));
     }
   }, [location.state]);
 
@@ -58,13 +51,27 @@ const BalloonsGridPage = () => {
     });
   }, []);
 
+  // Effect to manage automatic bursting
+  useEffect(() => {
+    if (currentBurstIndex < initialBalloons.length) {
+      const timer = setTimeout(() => {
+        if (balloonRefs.current[currentBurstIndex]) {
+          balloonRefs.current[currentBurstIndex].burstBalloon();
+        }
+        setCurrentBurstIndex(prevIndex => prevIndex + 1);
+      }, 2000); // Burst every 2 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentBurstIndex, initialBalloons.length]);
+
   // Effect to handle automatic navigation after all balloons are burst
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (allBalloonsBurst) {
       timer = setTimeout(() => {
         navigate(`/surprise/${name}`, { state: { phase: 'finalMessage' } });
-      }, 3000); // 3-second delay
+      }, 5000); // 5-second delay
     }
     return () => clearTimeout(timer); // Clean up the timer
   }, [allBalloonsBurst, name, navigate]);
@@ -85,10 +92,11 @@ const BalloonsGridPage = () => {
               isBurst={balloon.isBurst}
               onBurst={handleBalloonBurst}
               className="relative w-24 h-32 md:w-32 md:h-40" // Fixed size for grid items
+              ref={el => balloonRefs.current[index] = el} // Assign ref
+              isAutoBurstingActive={currentBurstIndex < initialBalloons.length} // True if auto-bursting is ongoing
             />
           ))}
         </div>
-        {/* The "See Final Message" button is removed */}
       </div>
     </div>
   );
