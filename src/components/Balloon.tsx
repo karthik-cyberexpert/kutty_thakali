@@ -5,10 +5,6 @@ import { cn } from '@/lib/utils';
 interface BalloonProps {
   id: string;
   imageSrc: string;
-  initialX?: number; // For initial positioning (e.g., the first balloon)
-  initialY?: number;
-  isInitialBalloon?: boolean; // True for the single balloon on MailContent page
-  onFlyUpComplete?: () => void; // Callback for initial balloon when it flies off
   isBurst?: boolean; // For balloons in the grid, controlled by parent
   onBurst?: (id: string) => void; // Callback when a grid balloon is clicked/burst
   className?: string; // For grid positioning
@@ -18,10 +14,6 @@ interface BalloonProps {
 const Balloon = forwardRef<any, BalloonProps>(({
   id,
   imageSrc,
-  initialX,
-  initialY,
-  isInitialBalloon = false,
-  onFlyUpComplete,
   isBurst: propIsBurst = false,
   onBurst,
   className,
@@ -35,7 +27,6 @@ const Balloon = forwardRef<any, BalloonProps>(({
   const [imageLoadError, setImageLoadError] = useState(false); // New state for image loading error
 
   useImperativeHandle(ref, () => ({
-    cutRopeAndFly,
     burstBalloon,
   }));
 
@@ -49,50 +40,12 @@ const Balloon = forwardRef<any, BalloonProps>(({
 
   useEffect(() => {
     const balloon = balloonRef.current;
-    const rope = ropeRef.current;
     if (!balloon) return;
 
-    if (isInitialBalloon) {
-      // Initial balloon appears at a specific position
-      gsap.set(balloon, {
-        x: initialX,
-        y: initialY,
-        xPercent: -50,
-        yPercent: -50,
-        scale: 0,
-        opacity: 0,
-        rotation: gsap.utils.random(-10, 10),
-      });
-      gsap.set(rope, { transformOrigin: 'top center' });
-
-      gsap.to(balloon, {
-        scale: 1,
-        opacity: 1,
-        duration: 0.8,
-        ease: 'back.out(1.7)',
-      });
-    } else {
-      // Balloons in the grid appear with a fade-in
-      gsap.set(balloon, { opacity: 0, scale: 0.8 });
-      gsap.to(balloon, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' });
-    }
-  }, [isInitialBalloon, initialX, initialY]);
-
-  const cutRopeAndFly = () => {
-    const balloon = balloonRef.current;
-    const rope = ropeRef.current;
-    if (!balloon || !rope) return;
-
-    gsap.timeline({ onComplete: onFlyUpComplete })
-      .to(rope, { opacity: 0, duration: 0.3 }, 0) // Rope fades out
-      .to(balloon, {
-        y: -window.innerHeight * 1.5, // Fly far up off-screen
-        x: '+=random(-100, 100)', // Slight horizontal drift
-        rotation: '+=random(-30, 30)', // Continue rotating
-        duration: 10, // Very slow motion
-        ease: 'power1.in', // Accelerate slightly as it goes up
-      }, 0);
-  };
+    // Balloons in the grid appear with a fade-in
+    gsap.set(balloon, { opacity: 0, scale: 0.8 });
+    gsap.to(balloon, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' });
+  }, []);
 
   const burstBalloon = () => {
     const balloon = balloonRef.current;
@@ -124,9 +77,8 @@ const Balloon = forwardRef<any, BalloonProps>(({
   };
 
   const handleClick = () => {
-    // Only allow manual click if it's NOT the initial balloon (shot by gun)
-    // AND if it's not already burst AND if automatic bursting is NOT active.
-    if (!isInitialBalloon && !internalIsBurst && !isAutoBurstingActive) {
+    // Only allow manual click if it's not already burst AND if automatic bursting is NOT active.
+    if (!internalIsBurst && !isAutoBurstingActive) {
       setInternalIsBurst(true); // Set internal state to trigger burst
       burstBalloon();
     }
@@ -140,15 +92,9 @@ const Balloon = forwardRef<any, BalloonProps>(({
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center justify-center", // Changed absolute to relative for grid items
-        isInitialBalloon ? "z-30" : "z-20", // Initial balloon on top, grid balloons below gun/hole
+        "relative flex flex-col items-center justify-center z-20", // Grid balloons below gun/hole
         className
       )}
-      style={{
-        left: isInitialBalloon ? initialX : undefined,
-        top: isInitialBalloon ? initialY : undefined,
-        transform: isInitialBalloon ? 'translate(-50%, -50%)' : undefined,
-      }}
       onClick={handleClick}
     >
       {!internalIsBurst && (
