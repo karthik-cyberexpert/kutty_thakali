@@ -5,7 +5,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import ParticlesBackground from '@/components/ParticlesBackground';
 import Balloon from '@/components/Balloon';
-import AnimeCharacterSVG from '@/components/AnimeCharacterSVG';
+import AnimeCharacterSVG from '@/components/AnimeCharacterSVG'; // Ensure this import is correct
 
 interface BalloonData {
   id: string;
