@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef, forwardRef, useImperativeHandle, useState } from 'react';
 import { gsap } from 'gsap';
 import { cn } from '@/lib/utils';
