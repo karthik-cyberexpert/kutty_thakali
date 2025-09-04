@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;700&family=Bangers&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -75,7 +75,7 @@
 
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(320deg, #1e0c42, #0c0e2a, #0a0a0a);
+    background: linear-gradient(320deg, #ff7e5f, #feb47b, #86a8e7, #91eae4); /* Vibrant anime-like gradient */
     font-family: 'Poppins', sans-serif;
   }
 }

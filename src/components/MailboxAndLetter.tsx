@@ -57,14 +57,14 @@ const MailboxAndLetter: React.FC<MailboxAndLetterProps> = ({ birthdayMessage, on
 
   return (
     <div ref={containerRef} className="absolute inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-sm p-4">
-      <div ref={mailboxRef} className="relative w-80 h-96 md:w-96 md:h-[500px] bg-gray-700 rounded-lg shadow-2xl border-4 border-gray-800 flex flex-col items-center justify-end overflow-hidden">
+      <div ref={mailboxRef} className="relative w-80 h-96 md:w-96 md:h-[500px] bg-blue-400 rounded-lg shadow-2xl border-4 border-blue-600 flex flex-col items-center justify-end overflow-hidden"> {/* Anime blue mailbox */}
         {/* Mailbox Body */}
-        <div className="w-full h-full bg-gray-600 rounded-b-lg" />
+        <div className="w-full h-full bg-blue-300 rounded-b-lg" />
 
         {/* Mailbox Lid */}
         <div
           ref={lidRef}
-          className="absolute top-0 left-0 w-full h-1/4 bg-gray-800 rounded-t-lg border-b-4 border-gray-900"
+          className="absolute top-0 left-0 w-full h-1/4 bg-blue-600 rounded-t-lg border-b-4 border-blue-700"
           style={{ transformOrigin: 'bottom center' }}
         />
 
@@ -74,14 +74,14 @@ const MailboxAndLetter: React.FC<MailboxAndLetterProps> = ({ birthdayMessage, on
           className="absolute w-[80%] h-[90%] bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between items-center text-center text-gray-800 border border-gray-200"
           style={{ transform: 'translateY(100%)' }}
         >
-          <p className="text-xl md:text-2xl font-script text-purple-800 leading-relaxed mb-4 flex-grow overflow-y-auto">
+          <p className="text-xl md:text-2xl font-script text-pink-600 leading-relaxed mb-4 flex-grow overflow-y-auto"> {/* Pink script font */}
             {birthdayMessage}
           </p>
           <Button
             ref={closeButtonRef}
             onClick={handleCloseClick}
             className={cn(
-              "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-8 text-lg rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105",
+              "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-anime py-3 px-8 text-lg rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105", // Anime button style
               "w-full max-w-xs mt-auto"
             )}
           >

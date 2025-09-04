@@ -102,10 +102,10 @@ const Balloon = forwardRef<any, BalloonProps>(({
           {/* Balloon Body */}
           <div
             ref={balloonRef}
-            className="w-24 h-32 md:w-32 md:h-40 rounded-full bg-gradient-to-br from-purple-400 to-pink-600 shadow-lg flex items-center justify-center text-white text-4xl"
-            style={{ filter: 'drop-shadow(0 0 10px rgba(255,0,255,0.5))' }}
+            className="w-24 h-32 md:w-32 md:h-40 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 shadow-lg flex items-center justify-center text-white text-4xl"
+            style={{ filter: 'drop-shadow(0 0 10px rgba(135,206,250,0.5))' }} {/* Blue shadow */}
           >
-            🎈
+            🌟
           </div>
           {/* Balloon Rope */}
           <div

@@ -69,8 +69,8 @@ const Bomb: React.FC<BombProps> = ({ initialX, initialY, onBombClick }) => {
         className="flex flex-col items-center justify-center cursor-pointer"
         onClick={handleClick}
       >
-        <BombIcon size={100} className="text-gray-800 drop-shadow-lg" style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))' }} />
-        <div ref={messageRef} className="text-white text-2xl font-bold mt-2 animate-pulse">
+        <BombIcon size={100} className="text-red-500 drop-shadow-lg" style={{ filter: 'drop-shadow(0 0 10px rgba(255,0,0,0.5))' }} /> {/* Vibrant red bomb */}
+        <div ref={messageRef} className="text-yellow-300 text-2xl font-anime mt-2 animate-pulse drop-shadow-[0_0_8px_rgba(255,255,0,0.7)]">
           Click Here!
         </div>
       </div>

@@ -54,7 +54,7 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
       ref={mailRef}
       onClick={handleClick}
       // Use flexbox to center the content within the absolute container
-      className="absolute inset-0 flex items-center justify-center z-50 cursor-pointer text-gray-700" // Changed to text-gray-700
+      className="absolute inset-0 flex items-center justify-center z-50 cursor-pointer text-purple-800/70" // Changed to a subtle purple
       style={{}} // Removed text-shadow
     >
       <MailIcon size={40} /> {/* Reduced size to 40 */}
