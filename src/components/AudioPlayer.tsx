@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,7 +37,7 @@ const AudioPlayer = ({ src }: AudioPlayerProps) => {
         onClick={toggleMute}
         variant="ghost"
         size="icon"
-        className="fixed top-4 right-4 z-50 bg-white/20 backdrop-blur-md text-white hover:bg-white/30"
+        className="fixed top-4 right-4 z-50 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 border-2 border-pink-300 rounded-full shadow-lg" // Added anime-style border
       >
         {isMuted ? <VolumeX className="h-6 w-6" /> : <Volume2 className="h-6 w-6" />}
         <span className="sr-only">Toggle sound</span>
