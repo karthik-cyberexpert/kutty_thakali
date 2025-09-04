@@ -32,7 +32,7 @@ const Surprise = () => {
   const mainContentRef = useRef<HTMLDivElement>(null);
   const findMailTextRef = useRef<HTMLDivElement>(null); // Ref for the new text
 
-  const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
+  const birthdayMessage = `Happy Birthday, ${name}! Unta na sorry sollikaren. I made you cry many times and still doing the same times only. But I promise I will try my best to be a better person for you. I hope this year I'll try to brings you all the happiness you want. Enjoy your special day! Once Again, Happy Birthday ${name}! 🎉🎂🎈`;
 
   // Effect to handle navigation state for final message
   useEffect(() => {

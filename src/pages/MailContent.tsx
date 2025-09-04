@@ -14,7 +14,7 @@ const MailContent = () => {
     location.state?.fromMailOpen ? 'mailbox' : 'transition' // Start with mailbox if navigated from mail open, otherwise directly transition
   );
 
-  const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
+  const birthdayMessage = `Happy Birthday, ${name}! Wishing you a very special day filled with joy and surprises! May your year ahead be as wonderful and unique as you are. Enjoy your day to the fullest! 🎉🎂🎈`;
 
   const handleMailboxClose = useCallback(() => {
     // Directly navigate to the balloons grid page after closing the mailbox
