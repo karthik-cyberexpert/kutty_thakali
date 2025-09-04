@@ -1,11 +1,13 @@
+"use client";
+
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { Mail as MailIcon } from 'lucide-react'; // Import Mail icon
+import { Mail as MailIcon } from 'lucide-react';
 
 interface MailProps {
-  explosionOrigin: { x: number; y: number }; // Where the explosion happened
-  onMailClick: () => void; // Callback when mail icon is clicked
-  onMailOpenComplete: () => void; // Callback for when mail opening animation finishes
+  explosionOrigin: { x: number; y: number };
+  onMailClick: () => void;
+  onMailOpenComplete: () => void;
 }
 
 const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenComplete }) => {
@@ -15,30 +17,27 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     const mail = mailRef.current;
     if (!mail) return;
 
-    // Ensure it's visible and clickable from the start of this phase
-    gsap.set(mail, { opacity: 1, scale: 1, rotation: 0 }); // Reset any previous GSAP states if component re-renders
+    gsap.set(mail, { opacity: 1, scale: 1, rotation: 0 });
 
-    // Start a continuous floating animation immediately
     gsap.to(mail, {
-      y: '+=15', // Move up and down by 15px
-      rotation: '+=5', // Subtle continuous rotation
+      y: '+=15',
+      rotation: '+=5',
       duration: 2,
       ease: 'sine.inOut',
       yoyo: true,
-      repeat: -1, // Infinite repeat
+      repeat: -1,
     });
 
-  }, []); // No dependencies, runs once on mount
+  }, []);
 
   const handleClick = () => {
     const mail = mailRef.current;
     if (!mail) return;
 
-    onMailClick(); // Notify parent to start fading burst and hide "Find a mail box" text
+    onMailClick();
 
-    // Mail opening animation
     gsap.timeline({
-      onComplete: onMailOpenComplete // Navigate after this animation
+      onComplete: onMailOpenComplete
     })
     .to(mail, {
       scale: 1.5,
@@ -53,11 +52,9 @@ const Mail: React.FC<MailProps> = ({ explosionOrigin, onMailClick, onMailOpenCom
     <div
       ref={mailRef}
       onClick={handleClick}
-      // Use flexbox to center the content within the absolute container
-      className="absolute inset-0 flex items-center justify-center z-50 cursor-pointer text-gray-700" // Changed to text-gray-700
-      style={{}} // Removed text-shadow
+      className="absolute inset-0 flex items-center justify-center z-50 cursor-pointer text-purple-400 drop-shadow-[0_0_10px_rgba(255,0,255,0.7)]" // Neon purple mail icon
     >
-      <MailIcon size={40} /> {/* Reduced size to 40 */}
+      <MailIcon size={40} />
     </div>
   );
 };

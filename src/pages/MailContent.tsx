@@ -1,30 +1,29 @@
+"use client";
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ParticlesBackground from '@/components/ParticlesBackground';
 import MailboxAndLetter from '@/components/MailboxAndLetter';
 import { gsap } from 'gsap';
+import AnimeCharacterSVG from '@/components/AnimeCharacterSVG';
 
 const MailContent = () => {
   const { name } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // The only phase now is 'mailbox'
   const [currentPhase, setCurrentPhase] = useState<'mailbox' | 'transition'>(
-    location.state?.fromMailOpen ? 'mailbox' : 'transition' // Start with mailbox if navigated from mail open, otherwise directly transition
+    location.state?.fromMailOpen ? 'mailbox' : 'transition'
   );
 
   const birthdayMessage = `Happy Birthday, ${name}! May your day be as bright and beautiful as your smile. Wishing you all the love and happiness in the world.`;
 
   const handleMailboxClose = useCallback(() => {
-    // Directly navigate to the balloons grid page after closing the mailbox
     navigate(`/balloons-grid/${name}`);
   }, [name, navigate]);
 
-  // Effect for initial page content animation (if not coming from mail open)
   useEffect(() => {
     if (currentPhase === 'transition') {
-      // If we're not showing the mailbox, immediately navigate
       navigate(`/balloons-grid/${name}`);
     }
   }, [currentPhase, name, navigate]);
@@ -34,7 +33,22 @@ const MailContent = () => {
       <ParticlesBackground />
 
       {currentPhase === 'mailbox' && (
-        <MailboxAndLetter birthdayMessage={birthdayMessage} onClose={handleMailboxClose} />
+        <>
+          <MailboxAndLetter birthdayMessage={birthdayMessage} onClose={handleMailboxClose} />
+          <AnimeCharacterSVG
+            expression="default"
+            characterColor="#FF00FF" // Neon Magenta
+            alt="Mail Anime Character"
+            initialX="-100px"
+            initialY="20%"
+            targetX="10%"
+            targetY="20%"
+            duration={1.5}
+            delay={0.5}
+            animationType="float"
+            className="w-28 h-auto md:w-36"
+          />
+        </>
       )}
     </div>
   );

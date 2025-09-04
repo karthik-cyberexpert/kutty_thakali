@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { Button } from '@/components/ui/button';
@@ -24,20 +26,14 @@ const MailboxAndLetter: React.FC<MailboxAndLetterProps> = ({ birthdayMessage, on
 
     if (!container || !mailbox || !lid || !letter || !closeButton) return;
 
-    // Initial states - Mailbox container is now immediately visible and centered
-    // Removed gsap.set(container, { opacity: 0, scale: 0.8 });
     gsap.set(lid, { rotationX: 0, transformOrigin: 'bottom center' });
     gsap.set(letter, { y: '100%', opacity: 0 });
     gsap.set(closeButton, { opacity: 0, y: 20 });
 
-    const tl = gsap.timeline({ delay: 0.5 }); // Keep a small delay for overall sequence
+    const tl = gsap.timeline({ delay: 0.5 });
 
-    // 1. Lid opens (starts after initial delay)
-    // Removed tl.to(container, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' })
     tl.to(lid, { rotationX: -90, duration: 0.5, ease: 'power2.out' })
-      // 2. Letter slides out
       .to(letter, { y: '0%', opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.2')
-      // 3. Close button appears
       .to(closeButton, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '+=0.5');
 
   }, []);
@@ -57,35 +53,35 @@ const MailboxAndLetter: React.FC<MailboxAndLetterProps> = ({ birthdayMessage, on
 
   return (
     <div ref={containerRef} className="absolute inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-sm p-4">
-      <div ref={mailboxRef} className="relative w-80 h-96 md:w-96 md:h-[500px] bg-gray-700 rounded-lg shadow-2xl border-4 border-gray-800 flex flex-col items-center justify-end overflow-hidden">
+      <div ref={mailboxRef} className="relative w-80 h-96 md:w-96 md:h-[500px] bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg shadow-2xl border-4 border-cyan-700 flex flex-col items-center justify-end overflow-hidden drop-shadow-[0_0_20px_rgba(0,255,255,0.5)]"> {/* Futuristic mailbox */}
         {/* Mailbox Body */}
-        <div className="w-full h-full bg-gray-600 rounded-b-lg" />
+        <div className="w-full h-full bg-gray-700 rounded-b-lg" />
 
         {/* Mailbox Lid */}
         <div
           ref={lidRef}
-          className="absolute top-0 left-0 w-full h-1/4 bg-gray-800 rounded-t-lg border-b-4 border-gray-900"
+          className="absolute top-0 left-0 w-full h-1/4 bg-gray-900 rounded-t-lg border-b-4 border-cyan-800"
           style={{ transformOrigin: 'bottom center' }}
         />
 
-        {/* Letter */}
+        {/* Letter - Holographic/Digital feel */}
         <div
           ref={letterRef}
-          className="absolute w-[80%] h-[90%] bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between items-center text-center text-gray-800 border border-gray-200"
+          className="absolute w-[80%] h-[90%] bg-gradient-to-br from-blue-900/80 to-purple-900/80 rounded-lg shadow-lg p-6 flex flex-col justify-between items-center text-center text-cyan-300 border border-cyan-500 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]" // Holographic letter
           style={{ transform: 'translateY(100%)' }}
         >
-          <p className="text-xl md:text-2xl font-script text-purple-800 leading-relaxed mb-4 flex-grow overflow-y-auto">
+          <p className="text-xl md:text-2xl font-anime text-cyan-300 leading-relaxed mb-4 flex-grow overflow-y-auto drop-shadow-[0_0_5px_rgba(0,255,255,0.3)]">
             {birthdayMessage}
           </p>
           <Button
             ref={closeButtonRef}
             onClick={handleCloseClick}
             className={cn(
-              "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-8 text-lg rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105",
+              "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-anime py-3 px-8 text-lg rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 border border-pink-400 drop-shadow-[0_0_10px_rgba(255,0,255,0.5)]", // Glowing button
               "w-full max-w-xs mt-auto"
             )}
           >
-            Close
+            Close Transmission
           </Button>
         </div>
       </div>

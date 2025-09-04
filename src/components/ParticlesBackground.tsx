@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { type Container, type ISourceOptions } from "@tsparticles/engine";
@@ -42,7 +44,7 @@ const ParticlesBackground = () => {
       },
       particles: {
         color: {
-          value: ["#ffffff", "#ff00ff", "#00ffff"],
+          value: ["#00FFFF", "#FF00FF", "#00FF00", "#FFFF00"], // Neon colors
         },
         links: {
           enable: false,
@@ -64,7 +66,7 @@ const ParticlesBackground = () => {
           value: 100,
         },
         opacity: {
-          value: { min: 0.3, max: 0.8 },
+          value: { min: 0.5, max: 1 }, // Brighter opacity
           animation: {
             enable: true,
             speed: 1,
@@ -72,7 +74,7 @@ const ParticlesBackground = () => {
           },
         },
         shape: {
-          type: ["circle", "char"],
+          type: ["circle", "square", "triangle", "star"], // More geometric shapes
           options: {
             char: {
               value: ["♥"],
@@ -93,8 +95,8 @@ const ParticlesBackground = () => {
         },
         shadow: {
             enable: true,
-            color: "#ff00ff",
-            blur: 10,
+            color: "#00FFFF", // Neon glow color
+            blur: 15, // Increased blur for stronger glow
         }
       },
       detectRetina: true,

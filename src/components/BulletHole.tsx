@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
@@ -16,7 +18,7 @@ const BulletHole: React.FC<BulletHoleProps> = ({ x, y }) => {
     gsap.set(hole, {
       left: x,
       top: y,
-      xPercent: -50, // Center the hole
+      xPercent: -50,
       yPercent: -50,
       scale: 0,
       opacity: 0,
@@ -33,9 +35,9 @@ const BulletHole: React.FC<BulletHoleProps> = ({ x, y }) => {
   return (
     <div
       ref={holeRef}
-      className="absolute w-32 h-32 rounded-full bg-black/70 border-4 border-purple-500 shadow-inner"
+      className="absolute w-32 h-32 rounded-full bg-purple-800/70 border-4 border-cyan-500 shadow-inner" // Darker, techy colors
       style={{
-        boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(128,0,128,0.7)',
+        boxShadow: 'inset 0 0 20px rgba(0,255,255,0.8), 0 0 30px rgba(255,0,255,0.7)', // Cyan and magenta glow
         filter: 'blur(1px)',
         zIndex: 30,
       }}

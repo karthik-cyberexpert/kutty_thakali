@@ -1,9 +1,11 @@
+"use client";
+
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
 interface WaveTransitionProps {
   onComplete: () => void;
-  onCover: () => void; // Callback when the wave fully covers the screen
+  onCover: () => void;
 }
 
 const WaveTransition: React.FC<WaveTransitionProps> = ({ onComplete, onCover }) => {
@@ -20,39 +22,34 @@ const WaveTransition: React.FC<WaveTransitionProps> = ({ onComplete, onCover }) 
 
     if (!containerRef.current || strips.length === 0 || !textElement) return;
 
-    // Initial state for strips and text
     gsap.set(strips, { width: '0%', x: '0%' });
     gsap.set(textElement, { opacity: 0, y: 20 });
 
     const tl = gsap.timeline({ onComplete: onComplete });
 
-    // Phase 1: Wave covers the screen
     strips.forEach((strip, i) => {
       const isLeftToRight = i % 2 === 0;
       if (isLeftToRight) {
         gsap.set(strip, { transformOrigin: 'left center' });
-        tl.to(strip, { width: '100%', duration: 0.6, ease: 'power2.out' }, i * 0.05); // Staggered entry
+        tl.to(strip, { width: '100%', duration: 0.6, ease: 'power2.out' }, i * 0.05);
       } else {
         gsap.set(strip, { transformOrigin: 'right center', x: '100%' });
-        tl.to(strip, { width: '100%', x: '0%', duration: 0.6, ease: 'power2.out' }, i * 0.05); // Staggered entry
+        tl.to(strip, { width: '100%', x: '0%', duration: 0.6, ease: 'power2.out' }, i * 0.05);
       }
     });
 
-    // Call onCover when the screen is fully covered by the wave
-    tl.call(onCover, [], `+=${0.6 + (NUM_STRIPS - 1) * 0.05 - 0.2}`); // Adjust timing to be when fully covered
+    tl.call(onCover, [], `+=${0.6 + (NUM_STRIPS - 1) * 0.05 - 0.2}`);
 
-    // Phase 2: Text appears
-    tl.to(textElement, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }, '+=0.5'); // Appear after wave covers
+    tl.to(textElement, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }, '+=0.5');
 
-    // Phase 3: Wave and text disappear
-    tl.to(textElement, { opacity: 0, y: -20, duration: 0.8, ease: 'power2.in' }, '+=2'); // Text fades out after a delay
+    tl.to(textElement, { opacity: 0, y: -20, duration: 0.8, ease: 'power2.in' }, '+=2');
 
     strips.forEach((strip, i) => {
       const isLeftToRight = i % 2 === 0;
       if (isLeftToRight) {
-        tl.to(strip, { width: '0%', duration: 0.6, ease: 'power2.in' }, '<'); // Staggered exit
+        tl.to(strip, { width: '0%', duration: 0.6, ease: 'power2.in' }, '<');
       } else {
-        tl.to(strip, { width: '0%', x: '100%', duration: 0.6, ease: 'power2.in' }, '<'); // Staggered exit
+        tl.to(strip, { width: '0%', x: '100%', duration: 0.6, ease: 'power2.in' }, '<');
       }
     });
 
@@ -63,17 +60,17 @@ const WaveTransition: React.FC<WaveTransitionProps> = ({ onComplete, onCover }) 
       {Array.from({ length: NUM_STRIPS }).map((_, i) => (
         <div
           key={i}
-          className="absolute bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500" // Changed to rainbow gradient
+          className="absolute bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 shadow-lg shadow-cyan-500/50" // Futuristic neon gradient
           style={{
             height: `${STRIP_HEIGHT_VH}vh`,
             top: `${i * STRIP_HEIGHT_VH}vh`,
             left: 0,
-            width: '0%', // Start hidden
+            width: '0%',
           }}
           ref={el => stripRefs.current[i] = el}
         />
       ))}
-      <div ref={textRef} className="absolute inset-0 flex items-center justify-center text-center text-5xl md:text-7xl font-script text-purple-800 z-40">
+      <div ref={textRef} className="absolute inset-0 flex items-center justify-center text-center text-5xl md:text-7xl font-anime text-pink-400 z-40 drop-shadow-[0_0_15px_rgba(255,0,255,0.8)]"> {/* Neon pink text */}
         Happy Birthday Kutty Thakali
       </div>
     </div>

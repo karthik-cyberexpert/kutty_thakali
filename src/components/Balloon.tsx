@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef, forwardRef, useImperativeHandle, useState } from 'react';
 import { gsap } from 'gsap';
 import { cn } from '@/lib/utils';
@@ -5,10 +7,10 @@ import { cn } from '@/lib/utils';
 interface BalloonProps {
   id: string;
   imageSrc: string;
-  isBurst?: boolean; // For balloons in the grid, controlled by parent
-  onBurst?: (id: string) => void; // Callback when a grid balloon is clicked/burst
-  className?: string; // For grid positioning
-  isAutoBurstingActive?: boolean; // New prop to indicate if automatic bursting is active
+  isBurst?: boolean;
+  onBurst?: (id: string) => void;
+  className?: string;
+  isAutoBurstingActive?: boolean;
 }
 
 const Balloon = forwardRef<any, BalloonProps>(({
@@ -17,20 +19,19 @@ const Balloon = forwardRef<any, BalloonProps>(({
   isBurst: propIsBurst = false,
   onBurst,
   className,
-  isAutoBurstingActive = false // Default to false
+  isAutoBurstingActive = false
 }, ref) => {
   const balloonRef = useRef<HTMLDivElement>(null);
   const ropeRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [internalIsBurst, setInternalIsBurst] = useState(propIsBurst);
   const [showImage, setShowImage] = useState(false);
-  const [imageLoadError, setImageLoadError] = useState(false); // New state for image loading error
+  const [imageLoadError, setImageLoadError] = useState(false);
 
   useImperativeHandle(ref, () => ({
     burstBalloon,
   }));
 
-  // Sync propIsBurst with internal state for grid balloons
   useEffect(() => {
     if (propIsBurst && !internalIsBurst) {
       setInternalIsBurst(true);
@@ -42,7 +43,6 @@ const Balloon = forwardRef<any, BalloonProps>(({
     const balloon = balloonRef.current;
     if (!balloon) return;
 
-    // Balloons in the grid appear with a fade-in
     gsap.set(balloon, { opacity: 0, scale: 0.8 });
     gsap.to(balloon, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' });
   }, []);
@@ -50,36 +50,34 @@ const Balloon = forwardRef<any, BalloonProps>(({
   const burstBalloon = () => {
     const balloon = balloonRef.current;
     const image = imageRef.current;
-    if (!balloon) return; // Image might not be rendered yet if showImage is false
+    if (!balloon) return;
 
     gsap.timeline({
       onComplete: () => {
-        setShowImage(true); // Ensure image is rendered
-        if (image) { // Check if image ref is available after rendering
+        setShowImage(true);
+        if (image) {
             gsap.fromTo(image,
               { opacity: 0, scale: 0.8 },
               { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.7)' }
             );
         }
-        onBurst?.(id); // Notify parent
+        onBurst?.(id);
       }
     })
     .to(balloon, {
-      scale: 1.3, // More pronounced pop out
-      opacity: 0, // Fade out
-      y: '-=20', // Move up slightly as it bursts
-      duration: 0.2, // Faster burst
+      scale: 1.3,
+      opacity: 0,
+      y: '-=20',
+      duration: 0.2,
       ease: 'power1.out',
       onStart: () => {
-        // Optional: Add a small "pop" sound effect here
       }
     });
   };
 
   const handleClick = () => {
-    // Only allow manual click if it's not already burst AND if automatic bursting is NOT active.
     if (!internalIsBurst && !isAutoBurstingActive) {
-      setInternalIsBurst(true); // Set internal state to trigger burst
+      setInternalIsBurst(true);
       burstBalloon();
     }
   };
@@ -92,25 +90,25 @@ const Balloon = forwardRef<any, BalloonProps>(({
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center justify-center z-20", // Grid balloons below gun/hole
+        "relative flex flex-col items-center justify-center z-20",
         className
       )}
       onClick={handleClick}
     >
       {!internalIsBurst && (
         <>
-          {/* Balloon Body */}
+          {/* Futuristic Balloon Body */}
           <div
             ref={balloonRef}
-            className="w-24 h-32 md:w-32 md:h-40 rounded-full bg-gradient-to-br from-purple-400 to-pink-600 shadow-lg flex items-center justify-center text-white text-4xl"
-            style={{ filter: 'drop-shadow(0 0 10px rgba(255,0,255,0.5))' }}
+            className="w-24 h-32 md:w-32 md:h-40 rounded-full bg-gradient-to-br from-blue-600 to-purple-800 shadow-lg flex items-center justify-center text-white text-4xl border-2 border-cyan-400" // Neon colors, border
+            style={{ filter: 'drop-shadow(0 0 10px rgba(0,255,255,0.5))' }} // Neon glow
           >
-            🎈
+            ⚡
           </div>
-          {/* Balloon Rope */}
+          {/* Futuristic Balloon Rope */}
           <div
             ref={ropeRef}
-            className="w-0.5 h-20 bg-gray-400 absolute top-full"
+            className="w-0.5 h-20 bg-cyan-500 absolute top-full shadow-md shadow-cyan-500/50" // Neon rope
             style={{ transformOrigin: 'top center' }}
           />
         </>
@@ -125,8 +123,8 @@ const Balloon = forwardRef<any, BalloonProps>(({
             ref={imageRef}
             src={imageSrc}
             alt={`Balloon burst image ${id}`}
-            className="absolute w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg shadow-lg border-2 border-white z-30" // Added z-index
-            onError={handleImageError} // Added error handler
+            className="absolute w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg shadow-lg border-2 border-cyan-400 z-30" // Neon border
+            onError={handleImageError}
           />
         )
       )}
