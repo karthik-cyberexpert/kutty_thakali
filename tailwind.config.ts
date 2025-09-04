@@ -20,8 +20,6 @@ export default {
     extend: {
       fontFamily: {
         script: ['"Great Vibes"', 'cursive'],
-        sans: ['Poppins', 'sans-serif'], // Ensure Poppins is default sans
-        anime: ['Bangers', 'cursive'], // New anime font
       },
       colors: {
         border: "hsl(var(--border))",

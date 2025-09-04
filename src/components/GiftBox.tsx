@@ -76,36 +76,36 @@ const GiftBox = forwardRef<HTMLDivElement, GiftBoxProps>(({ onOpen, className },
         "relative w-32 h-32 md:w-40 md:h-40 cursor-pointer transition-transform duration-300 hover:scale-110 overflow-hidden",
         className
       )}
-      style={{ filter: 'drop-shadow(0 0 15px rgba(255, 105, 180, 0.7))' }} {/* Pink shadow */}
+      style={{ filter: 'drop-shadow(0 0 15px rgba(255, 0, 255, 0.7))' }}
     >
       {/* Main Box Body */}
       <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-3/4 bg-pink-400 rounded-lg border-4 border-pink-600"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-3/4 bg-red-500 rounded-lg border-4 border-red-700"
         style={{ boxShadow: 'inset 0 -5px 10px rgba(0,0,0,0.2)' }}
       />
 
       {/* Ribbons (Horizontal and Vertical) */}
       <div ref={ribbonHorizontalRef} className="absolute inset-0 flex items-center justify-center">
-        <div className="w-full h-8 bg-yellow-200 absolute top-1/2 -translate-y-1/2" />
+        <div className="w-full h-8 bg-yellow-300 absolute top-1/2 -translate-y-1/2" />
       </div>
       <div ref={ribbonVerticalRef} className="absolute inset-0 flex items-center justify-center">
-        <div className="w-8 h-full bg-yellow-200 absolute left-1/2 -translate-x-1/2" />
+        <div className="w-8 h-full bg-yellow-300 absolute left-1/2 -translate-x-1/2" />
       </div>
 
       {/* Gift Box Lid */}
       <div
         ref={lidRef}
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[110%] h-1/4 bg-pink-400 rounded-lg border-4 border-pink-600"
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[110%] h-1/4 bg-red-500 rounded-lg border-4 border-red-700"
         style={{ boxShadow: '0 5px 10px rgba(0,0,0,0.2)', transformOrigin: 'bottom center', zIndex: 10 }}
       >
         {/* Ribbon on lid */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-full h-8 bg-yellow-200 absolute top-1/2 -translate-y-1/2" />
-          <div className="w-8 h-full bg-yellow-200 absolute left-1/2 -translate-x-1/2" />
+          <div className="w-full h-8 bg-yellow-300 absolute top-1/2 -translate-y-1/2" />
+          <div className="w-8 h-full bg-yellow-300 absolute left-1/2 -translate-x-1/2" />
         </div>
         {/* Bow */}
-        <div ref={bowRef} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-          <div className="w-8 h-8 bg-yellow-100 rounded-full"></div>
+        <div ref={bowRef} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-yellow-300 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-yellow-200 rounded-full"></div>
         </div>
       </div>
     </div>

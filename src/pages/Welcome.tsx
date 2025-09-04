@@ -32,10 +32,10 @@ const Welcome = () => {
       <ParticlesBackground />
       <div className="relative z-10 flex flex-col items-center text-center">
         <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl text-white max-w-lg w-full">
-          <h1 className="text-4xl md:text-5xl font-anime font-bold mb-4 text-shadow-lg text-pink-300 drop-shadow-[0_0_10px_rgba(255,192,203,0.7)]">
-            Welcome to the Anime Surprise!
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-shadow-lg">
+            Create a Birthday Surprise!
           </h1>
-          <p className="mb-8 text-lg text-yellow-100">Enter a name for the magic.</p>
+          <p className="mb-8 text-lg">Enter a name for the magic.</p>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
               type="text"
@@ -44,7 +44,7 @@ const Welcome = () => {
                 setName(e.target.value);
                 setError(null);
               }}
-              className="bg-purple-300/30 border-none text-white text-center text-lg placeholder:text-purple-100 focus:ring-2 focus:ring-yellow-300 rounded-lg"
+              className="bg-white/20 border-none text-white text-center text-lg placeholder:text-gray-300 focus:ring-2 focus:ring-pink-500 rounded-lg"
               placeholder="Enter a name"
             />
             {error && (
@@ -52,7 +52,7 @@ const Welcome = () => {
             )}
             <Button
               type="submit"
-              className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-anime py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 mt-2"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 mt-2"
               disabled={showSlider} // Disable button while slider is active
             >
               Let's Go <Gift className="ml-2" />

@@ -13,7 +13,7 @@ const GiftBurst = ({ originX, originY, fadeAway = false, onFadeOutComplete }: Gi
   const numParticles = 200;
   const particles = [
     '💖', '✨', '🎉', '🎂', '🎈', '⭐', '🎁', '🍰', '🎊', '❤️', '🥳', // Existing
-    '🌸', '🎀', '💫', '🌈', '🌟', '🎵', '🎶', '🍓', '🍦', '🍬', '🍩', '💖', '✨' // New anime-inspired items
+    '🍫', '🍪', '🍟', '🍕', '🍔', '📱', '🍬', '🍩', '🍦', '🥨', '🍿' // New items
   ];
 
   useEffect(() => {

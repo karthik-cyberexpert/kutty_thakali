@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
@@ -82,7 +80,7 @@ const BalloonsGridPage = () => {
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden p-4">
       <ParticlesBackground />
       <div className="relative z-10 text-center text-white w-full max-w-6xl mx-auto">
-        <h1 className="text-3xl md:text-5xl font-anime font-bold mb-8 animate-fade-in-down text-yellow-200 drop-shadow-[0_0_10px_rgba(255,255,0,0.7)]">
+        <h1 className="text-3xl md:text-5xl font-bold mb-8 animate-fade-in-down">
           Pop the Balloons, {name}!
         </h1>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4 justify-items-center">

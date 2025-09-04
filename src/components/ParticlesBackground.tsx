@@ -42,7 +42,7 @@ const ParticlesBackground = () => {
       },
       particles: {
         color: {
-          value: ["#FF69B4", "#87CEEB", "#FFD700", "#ADFF2F", "#FF4500"], // Vibrant, pastel anime colors
+          value: ["#ffffff", "#ff00ff", "#00ffff"],
         },
         links: {
           enable: false,
@@ -72,10 +72,10 @@ const ParticlesBackground = () => {
           },
         },
         shape: {
-          type: ["circle", "star", "heart"], // Anime-inspired shapes
+          type: ["circle", "char"],
           options: {
             char: {
-              value: ["♥"], // Keeping heart as a char option
+              value: ["♥"],
               font: "Verdana",
               style: "",
               weight: "400",
@@ -93,7 +93,7 @@ const ParticlesBackground = () => {
         },
         shadow: {
             enable: true,
-            color: "#FF69B4", // Matching a vibrant color
+            color: "#ff00ff",
             blur: 10,
         }
       },

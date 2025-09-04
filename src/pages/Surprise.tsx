@@ -159,7 +159,7 @@ const Surprise = () => {
       {animationPhase === 'gift' && (
         <div ref={mainContentRef} className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
           <div className="flex flex-col items-center animate-fade-in-down">
-            <h1 className="text-4xl md:text-6xl font-anime font-bold mb-8 text-yellow-200 drop-shadow-[0_0_10px_rgba(255,255,0,0.7)]">A special gift for you, {name}!</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-8">A special gift for you, {name}!</h1>
             <GiftBox onOpen={handleGiftOpen} />
           </div>
         </div>
@@ -192,8 +192,8 @@ const Surprise = () => {
           {showFindMailText && (
             <div
               ref={findMailTextRef}
-              className="absolute inset-0 flex flex-col items-center justify-start pt-20 z-40 text-white text-4xl md:text-5xl font-anime font-bold animate-fade-in-down"
-              style={{ textShadow: '0 0 15px rgba(255,105,180,0.8), 0 0 30px rgba(135,206,250,0.7)' }}
+              className="absolute inset-0 flex flex-col items-center justify-start pt-20 z-40 text-white text-4xl md:text-5xl font-bold animate-fade-in-down"
+              style={{ textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(0,255,255,0.7)' }}
             >
               Find a mail box!
             </div>
@@ -208,16 +208,16 @@ const Surprise = () => {
           {finalGiftRef.current && gsap.getProperty(finalGiftRef.current, "opacity") === 0 && <Confetti />}
           <div
             ref={messageRef}
-            className="font-anime text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400"
+            className="font-script text-4xl md:text-6xl max-w-3xl p-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400"
             style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
           >
             {birthdayMessage.split('').map((char, index) => <span key={index} className="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>)}
           </div>
           <div className="mt-8 h-12 relative min-w-[240px]">
-            <Button ref={revealButtonRef} onClick={handleReveal} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300 font-anime">
+            <Button ref={revealButtonRef} onClick={handleReveal} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
               <Eye className="mr-2 h-4 w-4" /> Reveal Message
             </Button>
-            <Button ref={replayButtonRef} onClick={handleReplay} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300 font-anime">
+            <Button ref={replayButtonRef} onClick={handleReplay} className="absolute inset-0 bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all duration-300">
               <RefreshCw className="mr-2 h-4 w-4" /> Replay
             </Button>
           </div>

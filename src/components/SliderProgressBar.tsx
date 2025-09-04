@@ -15,13 +15,13 @@ const SliderProgressBar: React.FC<SliderProgressBarProps> = ({ onComplete }) => 
   useEffect(() => {
     const value = sliderValue[0];
     if (value >= 75) {
-      setCurrentEmoji("🤩"); // More excited anime emoji
+      setCurrentEmoji("😁");
     } else if (value >= 50) {
-      setCurrentEmoji("😊");
+      setCurrentEmoji("🙂");
     } else if (value >= 25) {
-      setCurrentEmoji("😐");
+      setCurrentEmoji("😒");
     } else {
-      setCurrentEmoji("🥺"); // More expressive anime emoji
+      setCurrentEmoji("😭");
     }
   }, [sliderValue]);
 
@@ -36,7 +36,7 @@ const SliderProgressBar: React.FC<SliderProgressBarProps> = ({ onComplete }) => 
   return (
     <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-sm p-4">
       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl text-white max-w-lg w-full flex flex-col items-center text-center animate-fade-in-down">
-        <h2 className="text-3xl md:text-4xl font-anime font-bold mb-6 text-yellow-200 drop-shadow-[0_0_8px_rgba(255,255,0,0.5)]">How excited are you?</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">How excited are you?</h2>
         <div className="text-7xl mb-8 transition-transform duration-300 ease-out" style={{ transform: `scale(${1 + sliderValue[0] / 200})` }}>
           {currentEmoji}
         </div>
@@ -55,7 +55,7 @@ const SliderProgressBar: React.FC<SliderProgressBarProps> = ({ onComplete }) => 
         />
         <Button
           onClick={handleContinue}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-anime py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 w-full"
+          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 text-lg rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 w-full"
         >
           Continue
         </Button>

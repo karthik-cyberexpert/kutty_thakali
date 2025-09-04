@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
@@ -47,8 +45,8 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ onComplete }) => {
   return (
     <div
       ref={timerRef}
-      className="absolute inset-0 flex items-center justify-center z-50 text-white text-9xl font-anime font-bold"
-      style={{ textShadow: '0 0 20px rgba(255,105,180,0.8), 0 0 40px rgba(135,206,250,0.8)' }} {/* Pink and blue shadow */}
+      className="absolute inset-0 flex items-center justify-center z-50 text-white text-9xl font-bold"
+      style={{ textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,0,255,0.8)' }}
     >
       {count > 0 ? count : ''}
     </div>
