@@ -5,7 +5,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import ParticlesBackground from '@/components/ParticlesBackground';
 import Balloon from '@/components/Balloon';
-import AnimeCharacter from '@/components/AnimeCharacter'; // Import AnimeCharacter
+import AnimeCharacterSVG from '@/components/AnimeCharacterSVG'; // Import AnimeCharacterSVG
 
 interface BalloonData {
   id: string;
@@ -96,8 +96,9 @@ const BalloonsGridPage = () => {
         </div>
       </div>
       {currentBurstIndex < initialBalloons.length && (
-        <AnimeCharacter
-          src="/images/image-3.svg" // Character "popping" balloons
+        <AnimeCharacterSVG
+          expression="surprised"
+          characterColor="#FFD700" // Gold color
           alt="Balloon Popping Character"
           initialX="100%"
           initialY="50%"
@@ -110,8 +111,9 @@ const BalloonsGridPage = () => {
         />
       )}
       {allBalloonsBurst && (
-        <AnimeCharacter
-          src="/images/image-5.svg" // Character celebrating all balloons burst
+        <AnimeCharacterSVG
+          expression="celebrating"
+          characterColor="#FF4500" // Orange-red color
           alt="Celebrating Balloons Burst"
           initialX="-100px"
           initialY="50%"

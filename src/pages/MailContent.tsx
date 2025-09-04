@@ -5,7 +5,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ParticlesBackground from '@/components/ParticlesBackground';
 import MailboxAndLetter from '@/components/MailboxAndLetter';
 import { gsap } from 'gsap';
-import AnimeCharacter from '@/components/AnimeCharacter'; // Import AnimeCharacter
+import AnimeCharacterSVG from '@/components/AnimeCharacterSVG'; // Import AnimeCharacterSVG
 
 const MailContent = () => {
   const { name } = useParams();
@@ -35,8 +35,9 @@ const MailContent = () => {
       {currentPhase === 'mailbox' && (
         <>
           <MailboxAndLetter birthdayMessage={birthdayMessage} onClose={handleMailboxClose} />
-          <AnimeCharacter
-            src="/images/image-2.svg" // Character reacting to mail
+          <AnimeCharacterSVG
+            expression="default"
+            characterColor="#FFC0CB" // Pink color
             alt="Mail Anime Character"
             initialX="-100px"
             initialY="20%"

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import ParticlesBackground from "@/components/ParticlesBackground";
 import { Gift } from "lucide-react";
 import SliderProgressBar from "@/components/SliderProgressBar";
-import AnimeCharacter from "@/components/AnimeCharacter"; // Import AnimeCharacter
+import AnimeCharacterSVG from "@/components/AnimeCharacterSVG"; // Import AnimeCharacterSVG
 
 const Welcome = () => {
   const [name, setName] = useState("");
@@ -35,8 +35,9 @@ const Welcome = () => {
       <ParticlesBackground />
 
       {showCharacter && (
-        <AnimeCharacter
-          src="/images/image-1.svg" // Using image-1.svg as the anime character
+        <AnimeCharacterSVG
+          expression="default"
+          characterColor="#FFC0CB" // Pink color
           alt="Welcome Anime Character"
           initialX="-100px"
           initialY="80%"

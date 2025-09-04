@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import AnimeCharacterSVG from './AnimeCharacterSVG'; // Import the new SVG character
 
 interface BoyAndPaperAnimationProps {
   onComplete: () => void;
@@ -10,7 +11,7 @@ interface BoyAndPaperAnimationProps {
 
 const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete, onPaperCover }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const boyRef = useRef<HTMLImageElement>(null); // Changed to HTMLImageElement
+  const boyRef = useRef<HTMLDivElement>(null); // Changed to HTMLDivElement to hold SVG
   const paperRef = useRef<HTMLDivElement>(null);
   const wipeStripRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [showWipeStrips, setShowWipeStrips] = useState(false);
@@ -81,13 +82,18 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
 
   return (
     <div ref={containerRef} className="absolute inset-0 overflow-hidden">
-      <img
+      <div
         ref={boyRef}
-        src="/images/image-1.svg" // Using an anime character image
-        alt="Anime Boy"
         className="absolute"
         style={{ transformOrigin: 'bottom center', zIndex: 40, width: '100px', height: 'auto' }}
-      />
+      >
+        <AnimeCharacterSVG
+          expression="default"
+          characterColor="#FFC0CB" // Pink color for the boy
+          animationType="none" // Animation handled by parent
+          className="w-full h-full"
+        />
+      </div>
       <div
         ref={paperRef}
         className="absolute bg-white rounded-md shadow-2xl"
@@ -107,7 +113,7 @@ const BoyAndPaperAnimation: React.FC<BoyAndPaperAnimationProps> = ({ onComplete,
               style={{
                 height: `${STRIP_HEIGHT_VH}vh`,
                 width: '100vw',
-                top: `${i * STRIP_STRIP_HEIGHT_VH}vh`,
+                top: `${i * STRIP_HEIGHT_VH}vh`,
                 left: 0,
               }}
               ref={el => wipeStripRefs.current[i] = el}

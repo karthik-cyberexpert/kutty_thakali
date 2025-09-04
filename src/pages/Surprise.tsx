@@ -13,7 +13,7 @@ import GiftBurst from "@/components/GiftBurst";
 import Bomb from "@/components/Bomb";
 import CountdownTimer from "@/components/CountdownTimer";
 import Mail from "@/components/Mail";
-import AnimeCharacter from "@/components/AnimeCharacter"; // Import AnimeCharacter
+import AnimeCharacterSVG from "@/components/AnimeCharacterSVG"; // Import AnimeCharacterSVG
 
 type AnimationPhase = "gift" | "bombThrown" | "timerCountdown" | "explosion" | "finalMessage";
 
@@ -152,8 +152,9 @@ const Surprise = () => {
       {/* Phase: Gift Box */}
       {animationPhase === 'gift' && (
         <div ref={mainContentRef} className="relative z-10 flex flex-col items-center justify-center text-center text-white w-full h-full">
-          <AnimeCharacter
-            src="/images/image-2.svg" // Another anime character
+          <AnimeCharacterSVG
+            expression="default"
+            characterColor="#87CEEB" // Light blue color
             alt="Gift Anime Character"
             initialX="100%"
             initialY="20%"
@@ -175,8 +176,9 @@ const Surprise = () => {
       {animationPhase === 'bombThrown' && bombPosition && (
         <>
           <Bomb initialX={bombPosition.x} initialY={bombPosition.y} onBombClick={handleBombClick} />
-          <AnimeCharacter
-            src="/images/image-3.svg" // Character reacting to bomb
+          <AnimeCharacterSVG
+            expression="surprised"
+            characterColor="#FFD700" // Gold color
             alt="Surprised Anime Character"
             initialX="50%"
             initialY="100%"
@@ -195,8 +197,9 @@ const Surprise = () => {
       {animationPhase === 'timerCountdown' && (
         <>
           <CountdownTimer onComplete={handleTimerComplete} />
-          <AnimeCharacter
-            src="/images/image-4.svg" // Character looking anxious
+          <AnimeCharacterSVG
+            expression="anxious"
+            characterColor="#ADFF2F" // Green color
             alt="Anxious Anime Character"
             initialX="100%"
             initialY="50%"
@@ -233,8 +236,9 @@ const Surprise = () => {
               Find a mail box!
             </div>
           )}
-          <AnimeCharacter
-            src="/images/image-5.svg" // Character celebrating explosion
+          <AnimeCharacterSVG
+            expression="celebrating"
+            characterColor="#FF4500" // Orange-red color
             alt="Celebrating Anime Character"
             initialX="-100px"
             initialY="50%"
@@ -268,8 +272,9 @@ const Surprise = () => {
               <RefreshCw className="mr-2 h-4 w-4" /> Replay
             </Button>
           </div>
-          <AnimeCharacter
-            src="/images/image-1.svg" // Character wishing happy birthday
+          <AnimeCharacterSVG
+            expression="celebrating"
+            characterColor="#FFC0CB" // Pink color
             alt="Wishing Anime Character"
             initialX="100%"
             initialY="80%"
