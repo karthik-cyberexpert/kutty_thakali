@@ -1,13 +1,10 @@
-"use client";
-
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
 const Confetti = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const numConfetti = 150;
-  const colors = ['#FF69B4', '#87CEEB', '#FFD700', '#ADFF2F', '#FF4500', '#FFC0CB', '#ADD8E6', '#FFFF00', '#90EE90', '#FFA07A']; // Brighter, pastel anime colors
-  const shapes = ['✨', '⭐', '💖', '🌸', '💫', '🌈', '🎵', '🎶']; // Anime-inspired shapes
+  const colors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590', '#ff00ff', '#00ffff'];
 
   useEffect(() => {
     const container = containerRef.current;
@@ -16,11 +13,10 @@ const Confetti = () => {
     const confettiPieces = Array.from({ length: numConfetti }).map(() => {
       const piece = document.createElement('div');
       piece.style.position = 'absolute';
-      piece.style.fontSize = `${gsap.utils.random(15, 35)}px`; // Use font size for emojis
-      piece.innerText = gsap.utils.random(shapes); // Use anime shapes
+      piece.style.width = `${gsap.utils.random(5, 15)}px`;
+      piece.style.height = `${gsap.utils.random(5, 20)}px`;
+      piece.style.backgroundColor = gsap.utils.random(colors);
       piece.style.opacity = '0';
-      // No background color needed for emojis, but can add a subtle shadow
-      piece.style.textShadow = `0 0 5px ${gsap.utils.random(colors)}`;
       container.appendChild(piece);
       return piece;
     });
